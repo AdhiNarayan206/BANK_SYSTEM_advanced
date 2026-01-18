@@ -1,0 +1,136 @@
+2026-01-18 16:39:12,731 - __main__ - INFO - Starting Banking System API on port 5000 (debug=True)
+2026-01-18 16:39:14,071 - werkzeug - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:5000
+ * Running on http://192.168.0.100:5000
+2026-01-18 16:39:14,071 - werkzeug - INFO - [33mPress CTRL+C to quit[0m
+2026-01-18 16:39:14,078 - werkzeug - INFO -  * Restarting with watchdog (windowsapi)
+2026-01-18 16:39:14,412 - __main__ - INFO - Starting Banking System API on port 5000 (debug=True)
+2026-01-18 16:39:14,423 - werkzeug - WARNING -  * Debugger is active!
+2026-01-18 16:39:14,426 - werkzeug - INFO -  * Debugger PIN: 145-968-010
+2026-01-18 17:14:23,298 - werkzeug - INFO - 127.0.0.1 - - [18/Jan/2026 17:14:23] "OPTIONS /api/auth/login HTTP/1.1" 200 -
+2026-01-18 17:14:23,797 - __main__ - INFO - Successful login: albey@99.com
+2026-01-18 17:14:23,797 - werkzeug - INFO - 127.0.0.1 - - [18/Jan/2026 17:14:23] "POST /api/auth/login HTTP/1.1" 200 -
+2026-01-18 17:20:45,290 - werkzeug - INFO - 127.0.0.1 - - [18/Jan/2026 17:20:45] "OPTIONS /api/user/dashboard/590d2d86-de25-41ff-b1a9-be6826fc8a7e HTTP/1.1" 200 -
+2026-01-18 17:20:45,558 - werkzeug - INFO - 127.0.0.1 - - [18/Jan/2026 17:20:45] "[31m[1mGET /api/user/dashboard/590d2d86-de25-41ff-b1a9-be6826fc8a7e HTTP/1.1[0m" 401 -
+2026-01-18 17:20:45,610 - werkzeug - INFO - 127.0.0.1 - - [18/Jan/2026 17:20:45] "OPTIONS /api/auth/refresh HTTP/1.1" 200 -
+2026-01-18 17:20:45,884 - werkzeug - INFO - 127.0.0.1 - - [18/Jan/2026 17:20:45] "POST /api/auth/refresh HTTP/1.1" 200 -
+2026-01-18 17:20:45,921 - werkzeug - INFO - 127.0.0.1 - - [18/Jan/2026 17:20:45] "OPTIONS /api/user/dashboard/590d2d86-de25-41ff-b1a9-be6826fc8a7e HTTP/1.1" 200 -
+2026-01-18 17:20:46,228 - werkzeug - INFO - 127.0.0.1 - - [18/Jan/2026 17:20:46] "GET /api/user/dashboard/590d2d86-de25-41ff-b1a9-be6826fc8a7e HTTP/1.1" 200 -
+2026-01-18 17:22:02,049 - werkzeug - INFO - 127.0.0.1 - - [18/Jan/2026 17:22:02] "OPTIONS /api/auth/logout HTTP/1.1" 200 -
+2026-01-18 17:22:02,307 - __main__ - INFO - User logged out: 590d2d86-de25-41ff-b1a9-be6826fc8a7e
+2026-01-18 17:22:02,308 - werkzeug - INFO - 127.0.0.1 - - [18/Jan/2026 17:22:02] "POST /api/auth/logout HTTP/1.1" 200 -
+2026-01-18 17:22:45,269 - werkzeug - INFO - 127.0.0.1 - - [18/Jan/2026 17:22:45] "OPTIONS /api/auth/login HTTP/1.1" 200 -
+2026-01-18 17:22:45,700 - __main__ - INFO - Successful login: albey@99.com
+2026-01-18 17:22:45,700 - werkzeug - INFO - 127.0.0.1 - - [18/Jan/2026 17:22:45] "POST /api/auth/login HTTP/1.1" 200 -
+2026-01-18 17:22:45,842 - werkzeug - INFO - 127.0.0.1 - - [18/Jan/2026 17:22:45] "OPTIONS /api/user/dashboard/590d2d86-de25-41ff-b1a9-be6826fc8a7e HTTP/1.1" 200 -
+2026-01-18 17:22:46,014 - werkzeug - INFO - 127.0.0.1 - - [18/Jan/2026 17:22:46] "OPTIONS /api/user/dashboard/590d2d86-de25-41ff-b1a9-be6826fc8a7e HTTP/1.1" 200 -
+2026-01-18 17:22:46,029 - werkzeug - INFO - 127.0.0.1 - - [18/Jan/2026 17:22:46] "GET /api/user/dashboard/590d2d86-de25-41ff-b1a9-be6826fc8a7e HTTP/1.1" 200 -
+2026-01-18 17:22:46,171 - werkzeug - INFO - 127.0.0.1 - - [18/Jan/2026 17:22:46] "GET /api/user/dashboard/590d2d86-de25-41ff-b1a9-be6826fc8a7e HTTP/1.1" 200 -
+2026-01-18 17:23:13,076 - werkzeug - INFO - 127.0.0.1 - - [18/Jan/2026 17:23:13] "OPTIONS /api/account/create HTTP/1.1" 200 -
+2026-01-18 17:23:13,516 - __main__ - ERROR - Account creation error: (1054, "Unknown column 'pin_hash' in 'field list'")
+2026-01-18 17:23:13,517 - werkzeug - INFO - 127.0.0.1 - - [18/Jan/2026 17:23:13] "[35m[1mPOST /api/account/create HTTP/1.1[0m" 500 -
+2026-01-18 17:23:20,813 - werkzeug - INFO - 127.0.0.1 - - [18/Jan/2026 17:23:20] "OPTIONS /api/account/create HTTP/1.1" 200 -
+2026-01-18 17:23:21,238 - __main__ - ERROR - Account creation error: (1054, "Unknown column 'pin_hash' in 'field list'")
+2026-01-18 17:23:21,240 - werkzeug - INFO - 127.0.0.1 - - [18/Jan/2026 17:23:21] "[35m[1mPOST /api/account/create HTTP/1.1[0m" 500 -
+2026-01-18 17:24:27,321 - werkzeug - INFO -  * Detected change in 'c:\\Users\\adhin\\OneDrive\\Desktop\\VS CODE\\project\\BLOOD_BANK\\banking_systemremastered\\BLOOD_BANK_SYSTEM_advanced\\fix_db.py', reloading
+2026-01-18 17:24:27,569 - werkzeug - INFO -  * Detected change in 'c:\\Users\\adhin\\OneDrive\\Desktop\\VS CODE\\project\\BLOOD_BANK\\banking_systemremastered\\BLOOD_BANK_SYSTEM_advanced\\fix_db.py', reloading
+2026-01-18 17:24:27,570 - werkzeug - INFO -  * Detected change in 'c:\\Users\\adhin\\OneDrive\\Desktop\\VS CODE\\project\\BLOOD_BANK\\banking_systemremastered\\BLOOD_BANK_SYSTEM_advanced\\fix_db.py', reloading
+2026-01-18 17:24:27,570 - werkzeug - INFO -  * Detected change in 'c:\\Users\\adhin\\OneDrive\\Desktop\\VS CODE\\project\\BLOOD_BANK\\banking_systemremastered\\BLOOD_BANK_SYSTEM_advanced\\fix_db.py', reloading
+2026-01-18 17:24:28,425 - werkzeug - INFO -  * Restarting with watchdog (windowsapi)
+2026-01-18 17:24:28,948 - __main__ - INFO - Starting Banking System API on port 5000 (debug=True)
+2026-01-18 17:24:28,969 - werkzeug - WARNING -  * Debugger is active!
+2026-01-18 17:24:28,972 - werkzeug - INFO -  * Debugger PIN: 145-968-010
+2026-01-18 17:24:36,385 - werkzeug - INFO -  * Detected change in 'C:\\Users\\adhin\\AppData\\Local\\Programs\\Python\\Python313\\Lib\\site-packages\\flask\\__init__.py', reloading
+2026-01-18 17:24:36,396 - werkzeug - INFO -  * Detected change in 'C:\\Users\\adhin\\AppData\\Local\\Programs\\Python\\Python313\\Lib\\site-packages\\flask\\app.py', reloading
+2026-01-18 17:24:36,425 - werkzeug - INFO -  * Detected change in 'C:\\Users\\adhin\\AppData\\Local\\Programs\\Python\\Python313\\Lib\\site-packages\\flask\\sansio\\app.py', reloading
+2026-01-18 17:24:36,436 - werkzeug - INFO -  * Detected change in 'C:\\Users\\adhin\\AppData\\Local\\Programs\\Python\\Python313\\Lib\\site-packages\\flask\\sansio\\scaffold.py', reloading
+2026-01-18 17:24:36,450 - werkzeug - INFO -  * Detected change in 'C:\\Users\\adhin\\AppData\\Local\\Programs\\Python\\Python313\\Lib\\site-packages\\flask\\globals.py', reloading
+2026-01-18 17:24:36,453 - werkzeug - INFO -  * Detected change in 'C:\\Users\\adhin\\AppData\\Local\\Programs\\Python\\Python313\\Lib\\site-packages\\flask\\wrappers.py', reloading
+2026-01-18 17:24:36,459 - werkzeug - INFO -  * Detected change in 'C:\\Users\\adhin\\AppData\\Local\\Programs\\Python\\Python313\\Lib\\site-packages\\werkzeug\\wrappers\\__init__.py', reloading
+2026-01-18 17:24:36,460 - werkzeug - INFO -  * Detected change in 'C:\\Users\\adhin\\AppData\\Local\\Programs\\Python\\Python313\\Lib\\site-packages\\werkzeug\\wrappers\\request.py', reloading
+2026-01-18 17:24:36,470 - werkzeug - INFO -  * Detected change in 'C:\\Users\\adhin\\AppData\\Local\\Programs\\Python\\Python313\\Lib\\site-packages\\werkzeug\\sansio\\request.py', reloading
+2026-01-18 17:24:36,477 - werkzeug - INFO -  * Detected change in 'C:\\Users\\adhin\\AppData\\Local\\Programs\\Python\\Python313\\Lib\\site-packages\\flask\\json\\__init__.py', reloading
+2026-01-18 17:24:36,481 - werkzeug - INFO -  * Detected change in 'C:\\Users\\adhin\\AppData\\Local\\Programs\\Python\\Python313\\Lib\\site-packages\\werkzeug\\wrappers\\response.py', reloading
+2026-01-18 17:24:36,496 - werkzeug - INFO -  * Detected change in 'C:\\Users\\adhin\\AppData\\Local\\Programs\\Python\\Python313\\Lib\\site-packages\\werkzeug\\sansio\\response.py', reloading
+2026-01-18 17:24:36,518 - werkzeug - INFO -  * Detected change in 'C:\\Users\\adhin\\AppData\\Local\\Programs\\Python\\Python313\\Lib\\site-packages\\flask_mysqldb\\__init__.py', reloading
+2026-01-18 17:24:36,522 - werkzeug - INFO -  * Detected change in 'C:\\Users\\adhin\\AppData\\Local\\Programs\\Python\\Python313\\Lib\\site-packages\\flask_jwt_extended\\__init__.py', reloading
+2026-01-18 17:24:36,524 - werkzeug - INFO -  * Detected change in 'C:\\Users\\adhin\\AppData\\Local\\Programs\\Python\\Python313\\Lib\\site-packages\\flask_jwt_extended\\jwt_manager.py', reloading
+2026-01-18 17:24:36,532 - werkzeug - INFO -  * Detected change in 'C:\\Users\\adhin\\AppData\\Local\\Programs\\Python\\Python313\\Lib\\site-packages\\flask_jwt_extended\\utils.py', reloading
+2026-01-18 17:24:36,537 - werkzeug - INFO -  * Detected change in 'C:\\Users\\adhin\\AppData\\Local\\Programs\\Python\\Python313\\Lib\\site-packages\\werkzeug\\local.py', reloading
+2026-01-18 17:24:36,547 - werkzeug - INFO -  * Detected change in 'C:\\Users\\adhin\\AppData\\Local\\Programs\\Python\\Python313\\Lib\\site-packages\\flask_jwt_extended\\typing.py', reloading
+2026-01-18 17:24:36,549 - werkzeug - INFO -  * Detected change in 'C:\\Users\\adhin\\AppData\\Local\\Programs\\Python\\Python313\\Lib\\site-packages\\flask_jwt_extended\\view_decorators.py', reloading
+2026-01-18 17:24:36,564 - werkzeug - INFO -  * Detected change in 'C:\\Users\\adhin\\AppData\\Local\\Programs\\Python\\Python313\\Lib\\site-packages\\werkzeug\\security.py', reloading
+2026-01-18 17:24:36,568 - werkzeug - INFO -  * Detected change in 'C:\\Users\\adhin\\AppData\\Local\\Programs\\Python\\Python313\\Lib\\site-packages\\dotenv\\__init__.py', reloading
+2026-01-18 17:24:36,570 - werkzeug - INFO -  * Detected change in 'C:\\Users\\adhin\\AppData\\Local\\Programs\\Python\\Python313\\Lib\\site-packages\\dotenv\\main.py', reloading
+2026-01-18 17:24:36,586 - werkzeug - INFO -  * Detected change in 'C:\\Users\\adhin\\AppData\\Local\\Programs\\Python\\Python313\\Lib\\site-packages\\pydantic\\__init__.py', reloading
+2026-01-18 17:24:36,595 - werkzeug - INFO -  * Detected change in 'C:\\Users\\adhin\\AppData\\Local\\Programs\\Python\\Python313\\Lib\\site-packages\\pydantic\\errors.py', reloading
+2026-01-18 17:24:36,601 - werkzeug - INFO -  * Detected change in 'C:\\Users\\adhin\\AppData\\Local\\Programs\\Python\\Python313\\Lib\\site-packages\\pydantic\\main.py', reloading
+2026-01-18 17:24:36,620 - werkzeug - INFO -  * Detected change in 'C:\\Users\\adhin\\AppData\\Local\\Programs\\Python\\Python313\\Lib\\site-packages\\pydantic\\networks.py', reloading
+2026-01-18 17:24:36,632 - werkzeug - INFO -  * Detected change in 'C:\\Users\\adhin\\AppData\\Local\\Programs\\Python\\Python313\\Lib\\site-packages\\pydantic\\types.py', reloading
+2026-01-18 17:24:36,664 - werkzeug - INFO -  * Detected change in 'C:\\Users\\adhin\\AppData\\Local\\Programs\\Python\\Python313\\Lib\\site-packages\\pydantic\\deprecated\\tools.py', reloading
+2026-01-18 17:24:36,667 - werkzeug - INFO -  * Detected change in 'C:\\Users\\adhin\\AppData\\Local\\Programs\\Python\\Python313\\Lib\\site-packages\\pydantic_core\\__init__.py', reloading
+2026-01-18 17:24:36,702 - werkzeug - INFO -  * Detected change in 'C:\\Users\\adhin\\AppData\\Local\\Programs\\Python\\Python313\\Lib\\site-packages\\flask\\blueprints.py', reloading
+2026-01-18 17:24:36,705 - werkzeug - INFO -  * Detected change in 'C:\\Users\\adhin\\AppData\\Local\\Programs\\Python\\Python313\\Lib\\site-packages\\flask\\sansio\\blueprints.py', reloading
+2026-01-18 17:24:36,720 - werkzeug - INFO -  * Detected change in 'C:\\Users\\adhin\\AppData\\Local\\Programs\\Python\\Python313\\Lib\\site-packages\\flask\\config.py', reloading
+2026-01-18 17:24:36,752 - werkzeug - INFO -  * Detected change in 'C:\\Users\\adhin\\AppData\\Local\\Programs\\Python\\Python313\\Lib\\site-packages\\werkzeug\\utils.py', reloading
+2026-01-18 17:24:36,761 - werkzeug - INFO -  * Detected change in 'C:\\Users\\adhin\\AppData\\Local\\Programs\\Python\\Python313\\Lib\\site-packages\\werkzeug\\_internal.py', reloading
+2026-01-18 17:24:36,815 - werkzeug - INFO -  * Detected change in 'C:\\Users\\adhin\\AppData\\Local\\Programs\\Python\\Python313\\Lib\\site-packages\\flask\\ctx.py', reloading
+2026-01-18 17:24:36,835 - werkzeug - INFO -  * Detected change in 'C:\\Users\\adhin\\AppData\\Local\\Programs\\Python\\Python313\\Lib\\site-packages\\flask\\typing.py', reloading
+2026-01-18 17:24:36,839 - werkzeug - INFO -  * Detected change in 'C:\\Users\\adhin\\AppData\\Local\\Programs\\Python\\Python313\\Lib\\site-packages\\werkzeug\\datastructures\\__init__.py', reloading
+2026-01-18 17:24:36,842 - werkzeug - INFO -  * Detected change in 'C:\\Users\\adhin\\AppData\\Local\\Programs\\Python\\Python313\\Lib\\site-packages\\werkzeug\\datastructures\\headers.py', reloading
+2026-01-18 17:24:36,874 - werkzeug - INFO -  * Detected change in 'C:\\Users\\adhin\\AppData\\Local\\Programs\\Python\\Python313\\Lib\\site-packages\\flask_jwt_extended\\internal_utils.py', reloading
+2026-01-18 17:24:36,951 - werkzeug - INFO -  * Detected change in 'C:\\Users\\adhin\\AppData\\Local\\Programs\\Python\\Python313\\Lib\\site-packages\\werkzeug\\datastructures\\structures.py', reloading
+2026-01-18 17:24:37,069 - werkzeug - INFO -  * Restarting with watchdog (windowsapi)
+2026-01-18 17:24:37,466 - __main__ - INFO - Starting Banking System API on port 5000 (debug=True)
+2026-01-18 17:24:37,482 - werkzeug - WARNING -  * Debugger is active!
+2026-01-18 17:24:37,485 - werkzeug - INFO -  * Debugger PIN: 145-968-010
+2026-01-18 17:24:58,866 - werkzeug - INFO - 127.0.0.1 - - [18/Jan/2026 17:24:58] "OPTIONS /api/account/create HTTP/1.1" 200 -
+2026-01-18 17:24:59,268 - __main__ - INFO - New checking account opened for 590d2d86-de25-41ff-b1a9-be6826fc8a7e
+2026-01-18 17:24:59,269 - werkzeug - INFO - 127.0.0.1 - - [18/Jan/2026 17:24:59] "[35m[1mPOST /api/account/create HTTP/1.1[0m" 201 -
+2026-01-18 17:25:00,290 - werkzeug - INFO - 127.0.0.1 - - [18/Jan/2026 17:25:00] "OPTIONS /api/user/dashboard/590d2d86-de25-41ff-b1a9-be6826fc8a7e HTTP/1.1" 200 -
+2026-01-18 17:25:00,610 - werkzeug - INFO - 127.0.0.1 - - [18/Jan/2026 17:25:00] "GET /api/user/dashboard/590d2d86-de25-41ff-b1a9-be6826fc8a7e HTTP/1.1" 200 -
+2026-01-18 17:25:24,469 - werkzeug - INFO - 127.0.0.1 - - [18/Jan/2026 17:25:24] "OPTIONS /api/user/dashboard/590d2d86-de25-41ff-b1a9-be6826fc8a7e HTTP/1.1" 200 -
+2026-01-18 17:25:24,746 - werkzeug - INFO - 127.0.0.1 - - [18/Jan/2026 17:25:24] "GET /api/user/dashboard/590d2d86-de25-41ff-b1a9-be6826fc8a7e HTTP/1.1" 200 -
+2026-01-18 17:25:46,821 - werkzeug - INFO - 127.0.0.1 - - [18/Jan/2026 17:25:46] "OPTIONS /api/user/dashboard/590d2d86-de25-41ff-b1a9-be6826fc8a7e HTTP/1.1" 200 -
+2026-01-18 17:25:47,091 - werkzeug - INFO - 127.0.0.1 - - [18/Jan/2026 17:25:47] "GET /api/user/dashboard/590d2d86-de25-41ff-b1a9-be6826fc8a7e HTTP/1.1" 200 -
+2026-01-18 17:42:18,646 - werkzeug - INFO - 127.0.0.1 - - [18/Jan/2026 17:42:18] "OPTIONS /api/auth/login HTTP/1.1" 200 -
+2026-01-18 17:42:19,046 - __main__ - INFO - Successful login: albey@99.com
+2026-01-18 17:42:19,047 - werkzeug - INFO - 127.0.0.1 - - [18/Jan/2026 17:42:19] "POST /api/auth/login HTTP/1.1" 200 -
+2026-01-18 17:42:24,084 - werkzeug - INFO - 127.0.0.1 - - [18/Jan/2026 17:42:24] "OPTIONS /api/user/dashboard/590d2d86-de25-41ff-b1a9-be6826fc8a7e HTTP/1.1" 200 -
+2026-01-18 17:42:24,350 - werkzeug - INFO - 127.0.0.1 - - [18/Jan/2026 17:42:24] "GET /api/user/dashboard/590d2d86-de25-41ff-b1a9-be6826fc8a7e HTTP/1.1" 200 -
+2026-01-18 17:43:00,505 - werkzeug - INFO -  * Detected change in 'c:\\Users\\adhin\\OneDrive\\Desktop\\VS CODE\\project\\BLOOD_BANK\\banking_systemremastered\\BLOOD_BANK_SYSTEM_advanced\\app.py', reloading
+2026-01-18 17:43:01,299 - werkzeug - INFO -  * Restarting with watchdog (windowsapi)
+2026-01-18 17:43:01,728 - __main__ - INFO - Starting Banking System API on port 5000 (debug=True)
+2026-01-18 17:43:01,744 - werkzeug - WARNING -  * Debugger is active!
+2026-01-18 17:43:01,747 - werkzeug - INFO -  * Debugger PIN: 145-968-010
+2026-01-18 17:44:48,121 - werkzeug - INFO - 127.0.0.1 - - [18/Jan/2026 17:44:48] "OPTIONS /api/user/dashboard/590d2d86-de25-41ff-b1a9-be6826fc8a7e HTTP/1.1" 200 -
+2026-01-18 17:44:48,123 - werkzeug - INFO - 127.0.0.1 - - [18/Jan/2026 17:44:48] "OPTIONS /api/user/dashboard/590d2d86-de25-41ff-b1a9-be6826fc8a7e HTTP/1.1" 200 -
+2026-01-18 17:44:48,390 - werkzeug - INFO - 127.0.0.1 - - [18/Jan/2026 17:44:48] "GET /api/user/dashboard/590d2d86-de25-41ff-b1a9-be6826fc8a7e HTTP/1.1" 200 -
+2026-01-18 17:44:48,441 - werkzeug - INFO - 127.0.0.1 - - [18/Jan/2026 17:44:48] "GET /api/user/dashboard/590d2d86-de25-41ff-b1a9-be6826fc8a7e HTTP/1.1" 200 -
+2026-01-18 17:44:48,707 - werkzeug - INFO - 127.0.0.1 - - [18/Jan/2026 17:44:48] "OPTIONS /api/account/statement/5559d737-acbd-4897-951b-6af7d61cf440?days=30 HTTP/1.1" 200 -
+2026-01-18 17:44:48,708 - werkzeug - INFO - 127.0.0.1 - - [18/Jan/2026 17:44:48] "OPTIONS /api/account/statement/5559d737-acbd-4897-951b-6af7d61cf440?days=30 HTTP/1.1" 200 -
+2026-01-18 17:44:48,780 - werkzeug - INFO - 127.0.0.1 - - [18/Jan/2026 17:44:48] "GET /api/account/statement/5559d737-acbd-4897-951b-6af7d61cf440?days=30 HTTP/1.1" 200 -
+2026-01-18 17:44:49,022 - werkzeug - INFO - 127.0.0.1 - - [18/Jan/2026 17:44:49] "GET /api/account/statement/5559d737-acbd-4897-951b-6af7d61cf440?days=30 HTTP/1.1" 200 -
+2026-01-18 17:46:02,810 - werkzeug - INFO - 127.0.0.1 - - [18/Jan/2026 17:46:02] "OPTIONS /api/user/dashboard/590d2d86-de25-41ff-b1a9-be6826fc8a7e HTTP/1.1" 200 -
+2026-01-18 17:46:03,084 - werkzeug - INFO - 127.0.0.1 - - [18/Jan/2026 17:46:03] "GET /api/user/dashboard/590d2d86-de25-41ff-b1a9-be6826fc8a7e HTTP/1.1" 200 -
+2026-01-18 17:46:46,749 - werkzeug - INFO -  * Detected change in 'c:\\Users\\adhin\\OneDrive\\Desktop\\VS CODE\\project\\BLOOD_BANK\\banking_systemremastered\\BLOOD_BANK_SYSTEM_advanced\\backend_endpoints.py', reloading
+2026-01-18 17:46:46,767 - werkzeug - INFO -  * Detected change in 'c:\\Users\\adhin\\OneDrive\\Desktop\\VS CODE\\project\\BLOOD_BANK\\banking_systemremastered\\BLOOD_BANK_SYSTEM_advanced\\backend_endpoints.py', reloading
+2026-01-18 17:46:46,768 - werkzeug - INFO -  * Detected change in 'c:\\Users\\adhin\\OneDrive\\Desktop\\VS CODE\\project\\BLOOD_BANK\\banking_systemremastered\\BLOOD_BANK_SYSTEM_advanced\\backend_endpoints.py', reloading
+2026-01-18 17:46:46,768 - werkzeug - INFO -  * Detected change in 'c:\\Users\\adhin\\OneDrive\\Desktop\\VS CODE\\project\\BLOOD_BANK\\banking_systemremastered\\BLOOD_BANK_SYSTEM_advanced\\backend_endpoints.py', reloading
+2026-01-18 17:46:47,200 - werkzeug - INFO -  * Restarting with watchdog (windowsapi)
+2026-01-18 17:46:47,978 - __main__ - INFO - Starting Banking System API on port 5000 (debug=True)
+2026-01-18 17:46:47,994 - werkzeug - WARNING -  * Debugger is active!
+2026-01-18 17:46:47,999 - werkzeug - INFO -  * Debugger PIN: 145-968-010
+2026-01-18 17:46:54,428 - werkzeug - INFO -  * Detected change in 'c:\\Users\\adhin\\OneDrive\\Desktop\\VS CODE\\project\\BLOOD_BANK\\banking_systemremastered\\BLOOD_BANK_SYSTEM_advanced\\app.py', reloading
+2026-01-18 17:46:55,125 - werkzeug - INFO -  * Restarting with watchdog (windowsapi)
+2026-01-18 17:51:05,983 - __main__ - INFO - Starting Banking System API on port 5000 (debug=True)
+2026-01-18 17:51:07,322 - werkzeug - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:5000
+ * Running on http://192.168.0.100:5000
+2026-01-18 17:51:07,323 - werkzeug - INFO - [33mPress CTRL+C to quit[0m
+2026-01-18 17:51:07,332 - werkzeug - INFO -  * Restarting with watchdog (windowsapi)
+2026-01-18 17:51:07,668 - __main__ - INFO - Starting Banking System API on port 5000 (debug=True)
+2026-01-18 17:51:07,680 - werkzeug - WARNING -  * Debugger is active!
+2026-01-18 17:51:07,683 - werkzeug - INFO -  * Debugger PIN: 145-968-010
