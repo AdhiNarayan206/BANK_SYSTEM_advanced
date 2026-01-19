@@ -522,7 +522,7 @@
         <div class="modal-overlay" onclick="document.getElementById('profileSettingsModal').classList.remove('active')"></div>
         <div class="modal-content">
             <div class="modal-header">
-                <h2>Profile Customization</h2>
+                <h2>Profile & Security</h2>
                 <button class="modal-close" onclick="document.getElementById('profileSettingsModal').classList.remove('active')">×</button>
             </div>
             <div class="modal-body">
@@ -538,6 +538,42 @@
                     Update Profile
                 </button>
                 <div id="profileUpdateResult" class="result-message"></div>
+                
+                <hr style="margin: 2rem 0; border: 0; border-top: 1px solid rgba(255,255,255,0.1);">
+                
+                <h3>Security Settings</h3>
+                <button class="btn-secondary full-width" onclick="document.getElementById('profileSettingsModal').classList.remove('active'); document.getElementById('resetPinModal').classList.add('active');" style="margin-top: 1rem;">
+                    Reset Account PIN
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Reset PIN Modal -->
+    <div class="modal" id="resetPinModal">
+        <div class="modal-overlay" onclick="document.getElementById('resetPinModal').classList.remove('active')"></div>
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Reset Account PIN</h2>
+                <button class="modal-close" onclick="document.getElementById('resetPinModal').classList.remove('active')">×</button>
+            </div>
+            <div class="modal-body">
+                <div class="input-group">
+                    <label for="resetPinAccountId">Account ID</label>
+                    <input type="text" id="resetPinAccountId" placeholder="Enter account ID" class="input-field">
+                </div>
+                <div class="input-group">
+                    <label for="resetPinNewPin">New PIN (4-6 digits)</label>
+                    <input type="password" id="resetPinNewPin" placeholder="1234" class="input-field" maxlength="6">
+                </div>
+                <div class="input-group">
+                    <label for="resetPinPassword">Current Password</label>
+                    <input type="password" id="resetPinPassword" placeholder="Verify identity" class="input-field">
+                </div>
+                <button class="btn-primary full-width" id="submitResetPin">
+                    Update PIN
+                </button>
+                <div id="resetPinResult" class="result-message"></div>
             </div>
         </div>
     </div>

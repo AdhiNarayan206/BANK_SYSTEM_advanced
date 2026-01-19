@@ -374,6 +374,44 @@ Update user information.
 
 ---
 
+### Reset PIN
+
+**POST** `/account/reset-pin`  
+🔒 **Requires Authentication**
+
+Reset or update account PIN. Requires password verification for security.
+
+**Request Body:**
+```json
+{
+  "account_id": "account-uuid",
+  "new_pin": "1234",
+  "password": "UserLoginPassword"
+}
+```
+
+**Validation:**
+- `new_pin`: 4-6 digits
+- `password`: Must match user's login password
+
+**Success Response (200):**
+```json
+{
+  "success": true,
+  "message": "PIN reset successfully"
+}
+```
+
+**Error Response (401):**
+```json
+{
+  "success": false,
+  "error": "Invalid password"
+}
+```
+
+---
+
 ## Admin Operations
 
 ### Apply Interest
@@ -677,5 +715,5 @@ async function logout() {
 
 ---
 
-**Last Updated:** 2026-01-18  
+**Last Updated:** 2026-01-19  
 **Maintained by:** Banking System Development Team

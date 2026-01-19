@@ -25,7 +25,7 @@ from pydantic import ValidationError
 from validators import (
     UserRegistrationSchema, LoginSchema, DepositSchema,
     WithdrawalSchema, TransferSchema, UpdateProfileSchema,
-    CreateAccountSchema, SetPinSchema
+    CreateAccountSchema, SetPinSchema, ResetPinSchema
 )
 
 # Load environment variables
@@ -422,6 +422,60 @@ def set_account_pin():
         conn.rollback()
         logger.error(f"Set PIN error: {str(e)}")
         return jsonify({"success": False, "error": "Failed to set PIN"}), 500
+    finally:
+        cursor.close()
+
+
+@app.route('/api/account/reset-pin', methods=['POST'])
+@jwt_required()
+@validate_request(ResetPinSchema)
+def reset_account_pin():
+    """Reset PIN for an account (requires password verification)."""
+    current_user = get_jwt_identity()
+    data = request.validated_data
+    
+    conn = mysql.connection
+    cursor = conn.cursor(MySQLdb.cursors.DictCursor)
+    
+    try:
+        # Get account and user's password hash
+        cursor.execute(
+            """
+            SELECT a.user_id, a.pin_hash, au.password_hash 
+            FROM accounts a 
+            JOIN user_auth au ON a.user_id = au.user_id 
+            WHERE a.account_id = %s
+            """,
+            (data.account_id,)
+        )
+        account = cursor.fetchone()
+        
+        if not account:
+            return jsonify({"success": False, "error": "Account not found"}), 404
+            
+        if account['user_id'] != current_user:
+            return jsonify({"success": False, "error": "Unauthorized"}), 403
+            
+        # Verify Password
+        if not check_password_hash(account['password_hash'], data.password):
+            return jsonify({"success": False, "error": "Invalid password"}), 401
+            
+        hashed_pin = generate_password_hash(data.new_pin)
+        
+        cursor.execute(
+            "UPDATE accounts SET pin_hash = %s WHERE account_id = %s",
+            (hashed_pin, data.account_id)
+        )
+        conn.commit()
+        
+        logger.info(f"PIN reset for account {data.account_id} by {current_user}")
+        
+        return jsonify({"success": True, "message": "PIN reset successfully"}), 200
+        
+    except Exception as e:
+        conn.rollback()
+        logger.error(f"Reset PIN error: {str(e)}")
+        return jsonify({"success": False, "error": "Failed to reset PIN"}), 500
     finally:
         cursor.close()
 

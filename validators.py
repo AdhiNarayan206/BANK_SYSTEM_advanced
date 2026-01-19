@@ -165,3 +165,17 @@ class SetPinSchema(BaseModel):
         if not v.isdigit():
             raise ValueError('PIN must contain only numbers')
         return v
+
+
+class ResetPinSchema(BaseModel):
+    """Validate resetting a PIN for an account."""
+    account_id: str = Field(..., min_length=36, max_length=36, description="Account UUID")
+    new_pin: str = Field(..., min_length=4, max_length=6, description="New PIN")
+    password: str = Field(..., min_length=1, description="User current password for verification")
+
+    @field_validator('new_pin')
+    @classmethod
+    def validate_pin(cls, v: str) -> str:
+        if not v.isdigit():
+            raise ValueError('PIN must contain only numbers')
+        return v

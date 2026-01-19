@@ -404,6 +404,7 @@ async function loadDashboard() {
                     document.getElementById('depositAccountId').value = acc.account_id;
                     document.getElementById('fromAccount').value = acc.account_id;
                     document.getElementById('statementAccountId').value = acc.account_id;
+                    document.getElementById('resetPinAccountId').value = acc.account_id;
                     showToast('Account ID copied to forms!', 'info');
                 });
                 accountsList.appendChild(div);
@@ -565,6 +566,49 @@ document.getElementById('submitProfileUpdate').addEventListener('click', async (
         }
     } catch (error) {
         showResult('profileUpdateResult', error.message, false);
+    }
+});
+
+// Reset PIN
+document.getElementById('submitResetPin').addEventListener('click', async () => {
+    const accountId = document.getElementById('resetPinAccountId').value;
+    const newPin = document.getElementById('resetPinNewPin').value;
+    const password = document.getElementById('resetPinPassword').value;
+    
+    if (!accountId || !newPin || !password) {
+        return showResult('resetPinResult', 'Please fill all fields', false);
+    }
+    
+    if (newPin.length < 4 || newPin.length > 6) {
+        return showResult('resetPinResult', 'PIN must be 4-6 digits', false);
+    }
+    
+    try {
+        const response = await AuthManager.fetchWithAuth('/account/reset-pin', {
+            method: 'POST',
+            body: JSON.stringify({ 
+                account_id: accountId, 
+                new_pin: newPin,
+                password: password
+            })
+        });
+        
+        const data = await response.json();
+        
+        if (data.success) {
+            showResult('resetPinResult', 'PIN Reset Successfully!', true);
+            showToast('PIN has been updated', 'success');
+            setTimeout(() => {
+                document.getElementById('resetPinModal').classList.remove('active');
+                // Clear fields
+                document.getElementById('resetPinNewPin').value = '';
+                document.getElementById('resetPinPassword').value = '';
+            }, 2000);
+        } else {
+            showResult('resetPinResult', data.error, false);
+        }
+    } catch (error) {
+        showResult('resetPinResult', error.message, false);
     }
 });
 

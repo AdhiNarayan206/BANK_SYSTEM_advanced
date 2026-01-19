@@ -22,6 +22,7 @@ const Dashboard = () => {
     const [amount, setAmount] = useState('');
     const [recipientId, setRecipientId] = useState('');
     const [pin, setPin] = useState('');
+    const [password, setPassword] = useState('');
 
     useEffect(() => {
         fetchDashboardData();
@@ -114,18 +115,21 @@ const Dashboard = () => {
         setModalMessage({ type: '', text: '' });
 
         try {
-            const res = await api.post('/account/set-pin', {
+            // Use reset-pin instead of set-pin to allow changing existing PINs
+            const res = await api.post('/account/reset-pin', {
                 account_id: account.account_id,
-                pin: pin
+                new_pin: pin,
+                password: password
             });
 
             if (res.data.success) {
-                setModalMessage({ type: 'success', text: 'PIN set successfully!' });
+                setModalMessage({ type: 'success', text: 'PIN reset successfully!' });
                 setPin('');
+                setPassword('');
                 setTimeout(() => closeModal(), 2000);
             }
         } catch (err) {
-            setModalMessage({ type: 'error', text: err.response?.data?.error || 'Failed to set PIN' });
+            setModalMessage({ type: 'error', text: err.response?.data?.error || 'Failed to reset PIN' });
         } finally {
             setModalLoading(false);
         }
@@ -137,6 +141,7 @@ const Dashboard = () => {
         setAmount('');
         setRecipientId('');
         setPin('');
+        setPassword('');
     };
 
     if (loading) {
@@ -330,7 +335,7 @@ const Dashboard = () => {
 
                                 <Button type="submit" className="w-full bg-accent hover:bg-accent/90" isLoading={modalLoading}>
                                     {activeModal === 'deposit' ? 'Confirm Deposit' : 
-                                     activeModal === 'transfer' ? 'Send Money' : 'Update PIN'}
+                                     activeModal === 'transfer' ? 'Send Money' : 'Reset PIN'}
                                 </Button>
                             </form>
                         </div>
