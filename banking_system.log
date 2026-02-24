@@ -498,3 +498,84 @@
 2026-02-24 22:48:37,872 - __main__ - INFO - Starting Banking System API on port 5000 (debug=True)
 2026-02-24 22:48:37,894 - werkzeug - WARNING -  * Debugger is active!
 2026-02-24 22:48:37,898 - werkzeug - INFO -  * Debugger PIN: 210-059-380
+2026-02-24 22:57:59,668 - werkzeug - INFO -  * Detected change in 'C:\\Users\\adhin\\OneDrive\\Desktop\\VS CODE\\project\\BLOOD_BANK\\banking_systemremastered\\BLOOD_BANK_SYSTEM_advanced\\validators.py', reloading
+2026-02-24 22:58:00,689 - werkzeug - INFO -  * Restarting with watchdog (windowsapi)
+2026-02-24 22:58:01,100 - __main__ - INFO - Starting Banking System API on port 5000 (debug=True)
+2026-02-24 22:58:01,113 - werkzeug - WARNING -  * Debugger is active!
+2026-02-24 22:58:01,115 - werkzeug - INFO -  * Debugger PIN: 210-059-380
+2026-02-24 23:01:56,543 - werkzeug - INFO - 127.0.0.1 - - [24/Feb/2026 23:01:56] "OPTIONS /api/user/dashboard/acdb470e-87c8-42cd-8ea8-4a5932d19d6c HTTP/1.1" 200 -
+2026-02-24 23:01:56,827 - werkzeug - INFO - 127.0.0.1 - - [24/Feb/2026 23:01:56] "GET /api/user/dashboard/acdb470e-87c8-42cd-8ea8-4a5932d19d6c HTTP/1.1" 200 -
+2026-02-24 23:01:56,863 - werkzeug - INFO - 127.0.0.1 - - [24/Feb/2026 23:01:56] "OPTIONS /api/analytics/spending/7b3409d9-4019-4c33-9c29-ca44af337a0b HTTP/1.1" 200 -
+2026-02-24 23:01:57,142 - werkzeug - INFO - 127.0.0.1 - - [24/Feb/2026 23:01:57] "OPTIONS /api/account/missions/7b3409d9-4019-4c33-9c29-ca44af337a0b HTTP/1.1" 200 -
+2026-02-24 23:01:57,143 - werkzeug - INFO - 127.0.0.1 - - [24/Feb/2026 23:01:57] "OPTIONS /api/account/approvals HTTP/1.1" 200 -
+2026-02-24 23:01:57,149 - werkzeug - INFO - 127.0.0.1 - - [24/Feb/2026 23:01:57] "GET /api/analytics/spending/7b3409d9-4019-4c33-9c29-ca44af337a0b HTTP/1.1" 200 -
+2026-02-24 23:01:57,179 - werkzeug - INFO - 127.0.0.1 - - [24/Feb/2026 23:01:57] "GET /api/account/missions/7b3409d9-4019-4c33-9c29-ca44af337a0b HTTP/1.1" 200 -
+2026-02-24 23:01:57,458 - werkzeug - INFO - 127.0.0.1 - - [24/Feb/2026 23:01:57] "[35m[1mGET /api/account/approvals HTTP/1.1[0m" 500 -
+2026-02-24 23:02:09,768 - werkzeug - INFO - 127.0.0.1 - - [24/Feb/2026 23:02:09] "OPTIONS /api/user/dashboard/acdb470e-87c8-42cd-8ea8-4a5932d19d6c HTTP/1.1" 200 -
+2026-02-24 23:02:10,082 - werkzeug - INFO - 127.0.0.1 - - [24/Feb/2026 23:02:10] "GET /api/user/dashboard/acdb470e-87c8-42cd-8ea8-4a5932d19d6c HTTP/1.1" 200 -
+2026-02-24 23:02:10,339 - werkzeug - INFO - 127.0.0.1 - - [24/Feb/2026 23:02:10] "OPTIONS /api/analytics/spending/7b3409d9-4019-4c33-9c29-ca44af337a0b HTTP/1.1" 200 -
+2026-02-24 23:02:10,402 - werkzeug - INFO - 127.0.0.1 - - [24/Feb/2026 23:02:10] "OPTIONS /api/account/missions/7b3409d9-4019-4c33-9c29-ca44af337a0b HTTP/1.1" 200 -
+2026-02-24 23:02:10,403 - werkzeug - INFO - 127.0.0.1 - - [24/Feb/2026 23:02:10] "OPTIONS /api/account/approvals HTTP/1.1" 200 -
+2026-02-24 23:02:10,409 - werkzeug - INFO - 127.0.0.1 - - [24/Feb/2026 23:02:10] "GET /api/analytics/spending/7b3409d9-4019-4c33-9c29-ca44af337a0b HTTP/1.1" 200 -
+2026-02-24 23:02:10,655 - werkzeug - INFO - 127.0.0.1 - - [24/Feb/2026 23:02:10] "GET /api/account/missions/7b3409d9-4019-4c33-9c29-ca44af337a0b HTTP/1.1" 200 -
+2026-02-24 23:02:10,718 - werkzeug - INFO - 127.0.0.1 - - [24/Feb/2026 23:02:10] "[35m[1mGET /api/account/approvals HTTP/1.1[0m" 500 -
+2026-02-24 23:02:18,198 - werkzeug - INFO - 127.0.0.1 - - [24/Feb/2026 23:02:18] "OPTIONS /api/account/deposit HTTP/1.1" 200 -
+2026-02-24 23:02:18,528 - __main__ - INFO - Deposit: 555.0 to 7b3409d9-4019-4c33-9c29-ca44af337a0b, new balance: 555.0, status: completed
+2026-02-24 23:02:18,529 - werkzeug - INFO - 127.0.0.1 - - [24/Feb/2026 23:02:18] "POST /api/account/deposit HTTP/1.1" 200 -
+2026-02-24 23:02:18,778 - werkzeug - INFO - 127.0.0.1 - - [24/Feb/2026 23:02:18] "OPTIONS /api/user/dashboard/acdb470e-87c8-42cd-8ea8-4a5932d19d6c HTTP/1.1" 200 -
+2026-02-24 23:02:18,845 - werkzeug - INFO - 127.0.0.1 - - [24/Feb/2026 23:02:18] "GET /api/user/dashboard/acdb470e-87c8-42cd-8ea8-4a5932d19d6c HTTP/1.1" 200 -
+2026-02-24 23:02:19,086 - werkzeug - INFO - 127.0.0.1 - - [24/Feb/2026 23:02:19] "OPTIONS /api/analytics/spending/7b3409d9-4019-4c33-9c29-ca44af337a0b HTTP/1.1" 200 -
+2026-02-24 23:02:19,164 - werkzeug - INFO - 127.0.0.1 - - [24/Feb/2026 23:02:19] "OPTIONS /api/account/missions/7b3409d9-4019-4c33-9c29-ca44af337a0b HTTP/1.1" 200 -
+2026-02-24 23:02:19,165 - werkzeug - INFO - 127.0.0.1 - - [24/Feb/2026 23:02:19] "OPTIONS /api/account/approvals HTTP/1.1" 200 -
+2026-02-24 23:02:19,180 - werkzeug - INFO - 127.0.0.1 - - [24/Feb/2026 23:02:19] "GET /api/analytics/spending/7b3409d9-4019-4c33-9c29-ca44af337a0b HTTP/1.1" 200 -
+2026-02-24 23:02:19,403 - werkzeug - INFO - 127.0.0.1 - - [24/Feb/2026 23:02:19] "GET /api/account/missions/7b3409d9-4019-4c33-9c29-ca44af337a0b HTTP/1.1" 200 -
+2026-02-24 23:02:19,477 - werkzeug - INFO - 127.0.0.1 - - [24/Feb/2026 23:02:19] "[35m[1mGET /api/account/approvals HTTP/1.1[0m" 500 -
+2026-02-24 23:02:45,748 - werkzeug - INFO - 127.0.0.1 - - [24/Feb/2026 23:02:45] "OPTIONS /api/loans/apply HTTP/1.1" 200 -
+2026-02-24 23:02:46,224 - __main__ - INFO - Loan granted: 5ae50dd0-c41d-420a-b052-1fcd1ae39955 to acdb470e-87c8-42cd-8ea8-4a5932d19d6c for 50.0
+2026-02-24 23:02:46,225 - werkzeug - INFO - 127.0.0.1 - - [24/Feb/2026 23:02:46] "[35m[1mPOST /api/loans/apply HTTP/1.1[0m" 201 -
+2026-02-24 23:02:46,319 - werkzeug - INFO - 127.0.0.1 - - [24/Feb/2026 23:02:46] "OPTIONS /api/user/dashboard/acdb470e-87c8-42cd-8ea8-4a5932d19d6c HTTP/1.1" 200 -
+2026-02-24 23:02:46,539 - werkzeug - INFO - 127.0.0.1 - - [24/Feb/2026 23:02:46] "GET /api/user/dashboard/acdb470e-87c8-42cd-8ea8-4a5932d19d6c HTTP/1.1" 200 -
+2026-02-24 23:02:46,631 - werkzeug - INFO - 127.0.0.1 - - [24/Feb/2026 23:02:46] "OPTIONS /api/analytics/spending/7b3409d9-4019-4c33-9c29-ca44af337a0b HTTP/1.1" 200 -
+2026-02-24 23:02:46,850 - werkzeug - INFO - 127.0.0.1 - - [24/Feb/2026 23:02:46] "OPTIONS /api/account/missions/7b3409d9-4019-4c33-9c29-ca44af337a0b HTTP/1.1" 200 -
+2026-02-24 23:02:46,851 - werkzeug - INFO - 127.0.0.1 - - [24/Feb/2026 23:02:46] "OPTIONS /api/account/approvals HTTP/1.1" 200 -
+2026-02-24 23:02:46,857 - werkzeug - INFO - 127.0.0.1 - - [24/Feb/2026 23:02:46] "GET /api/analytics/spending/7b3409d9-4019-4c33-9c29-ca44af337a0b HTTP/1.1" 200 -
+2026-02-24 23:02:46,947 - werkzeug - INFO - 127.0.0.1 - - [24/Feb/2026 23:02:46] "GET /api/account/missions/7b3409d9-4019-4c33-9c29-ca44af337a0b HTTP/1.1" 200 -
+2026-02-24 23:02:47,163 - werkzeug - INFO - 127.0.0.1 - - [24/Feb/2026 23:02:47] "[35m[1mGET /api/account/approvals HTTP/1.1[0m" 500 -
+2026-02-24 23:03:06,432 - werkzeug - INFO - 127.0.0.1 - - [24/Feb/2026 23:03:06] "OPTIONS /api/user/dashboard/acdb470e-87c8-42cd-8ea8-4a5932d19d6c HTTP/1.1" 200 -
+2026-02-24 23:03:06,745 - werkzeug - INFO - 127.0.0.1 - - [24/Feb/2026 23:03:06] "GET /api/user/dashboard/acdb470e-87c8-42cd-8ea8-4a5932d19d6c HTTP/1.1" 200 -
+2026-02-24 23:03:07,008 - werkzeug - INFO - 127.0.0.1 - - [24/Feb/2026 23:03:07] "OPTIONS /api/analytics/spending/7b3409d9-4019-4c33-9c29-ca44af337a0b HTTP/1.1" 200 -
+2026-02-24 23:03:07,055 - werkzeug - INFO - 127.0.0.1 - - [24/Feb/2026 23:03:07] "OPTIONS /api/account/missions/7b3409d9-4019-4c33-9c29-ca44af337a0b HTTP/1.1" 200 -
+2026-02-24 23:03:07,055 - werkzeug - INFO - 127.0.0.1 - - [24/Feb/2026 23:03:07] "OPTIONS /api/account/approvals HTTP/1.1" 200 -
+2026-02-24 23:03:07,060 - werkzeug - INFO - 127.0.0.1 - - [24/Feb/2026 23:03:07] "GET /api/analytics/spending/7b3409d9-4019-4c33-9c29-ca44af337a0b HTTP/1.1" 200 -
+2026-02-24 23:03:07,322 - werkzeug - INFO - 127.0.0.1 - - [24/Feb/2026 23:03:07] "GET /api/account/missions/7b3409d9-4019-4c33-9c29-ca44af337a0b HTTP/1.1" 200 -
+2026-02-24 23:03:07,367 - werkzeug - INFO - 127.0.0.1 - - [24/Feb/2026 23:03:07] "[35m[1mGET /api/account/approvals HTTP/1.1[0m" 500 -
+2026-02-24 23:04:34,887 - werkzeug - INFO - 127.0.0.1 - - [24/Feb/2026 23:04:34] "OPTIONS /api/user/dashboard/590d2d86-de25-41ff-b1a9-be6826fc8a7e HTTP/1.1" 200 -
+2026-02-24 23:04:34,888 - werkzeug - INFO - 127.0.0.1 - - [24/Feb/2026 23:04:34] "OPTIONS /api/user/dashboard/590d2d86-de25-41ff-b1a9-be6826fc8a7e HTTP/1.1" 200 -
+2026-02-24 23:04:35,151 - werkzeug - INFO - 127.0.0.1 - - [24/Feb/2026 23:04:35] "[31m[1mGET /api/user/dashboard/590d2d86-de25-41ff-b1a9-be6826fc8a7e HTTP/1.1[0m" 401 -
+2026-02-24 23:04:35,198 - werkzeug - INFO - 127.0.0.1 - - [24/Feb/2026 23:04:35] "[31m[1mGET /api/user/dashboard/590d2d86-de25-41ff-b1a9-be6826fc8a7e HTTP/1.1[0m" 401 -
+2026-02-24 23:04:36,568 - werkzeug - INFO - 127.0.0.1 - - [24/Feb/2026 23:04:36] "OPTIONS /api/auth/login HTTP/1.1" 200 -
+2026-02-24 23:04:37,024 - __main__ - WARNING - Failed login attempt: albey@99.com
+2026-02-24 23:04:37,026 - werkzeug - INFO - 127.0.0.1 - - [24/Feb/2026 23:04:37] "[31m[1mPOST /api/auth/login HTTP/1.1[0m" 401 -
+2026-02-24 23:04:38,348 - __main__ - WARNING - Failed login attempt: albey@99.com
+2026-02-24 23:04:38,349 - werkzeug - INFO - 127.0.0.1 - - [24/Feb/2026 23:04:38] "[31m[1mPOST /api/auth/login HTTP/1.1[0m" 401 -
+2026-02-24 23:04:40,051 - __main__ - WARNING - Failed login attempt: albey@99.com
+2026-02-24 23:04:40,053 - werkzeug - INFO - 127.0.0.1 - - [24/Feb/2026 23:04:40] "[31m[1mPOST /api/auth/login HTTP/1.1[0m" 401 -
+2026-02-24 23:04:43,975 - werkzeug - INFO - 127.0.0.1 - - [24/Feb/2026 23:04:43] "GET /api/branches HTTP/1.1" 200 -
+2026-02-24 23:05:10,706 - werkzeug - INFO - 127.0.0.1 - - [24/Feb/2026 23:05:10] "OPTIONS /api/auth/register HTTP/1.1" 200 -
+2026-02-24 23:05:10,955 - __main__ - WARNING - Validation error: [{'type': 'value_error', 'loc': ('password',), 'msg': 'Value error, Password must contain at least one uppercase letter', 'input': '12345678', 'ctx': {'error': ValueError('Password must contain at least one uppercase letter')}, 'url': 'https://errors.pydantic.dev/2.12/v/value_error'}]
+2026-02-24 23:05:10,956 - werkzeug - INFO - 127.0.0.1 - - [24/Feb/2026 23:05:10] "[31m[1mPOST /api/auth/register HTTP/1.1[0m" 400 -
+2026-02-24 23:05:12,538 - __main__ - WARNING - Validation error: [{'type': 'value_error', 'loc': ('password',), 'msg': 'Value error, Password must contain at least one uppercase letter', 'input': '12345678', 'ctx': {'error': ValueError('Password must contain at least one uppercase letter')}, 'url': 'https://errors.pydantic.dev/2.12/v/value_error'}]
+2026-02-24 23:05:12,538 - werkzeug - INFO - 127.0.0.1 - - [24/Feb/2026 23:05:12] "[31m[1mPOST /api/auth/register HTTP/1.1[0m" 400 -
+2026-02-24 23:05:14,596 - werkzeug - INFO - 127.0.0.1 - - [24/Feb/2026 23:05:14] "OPTIONS /api/auth/login HTTP/1.1" 200 -
+2026-02-24 23:05:15,020 - __main__ - WARNING - Failed login attempt: albey@99.com
+2026-02-24 23:05:15,021 - werkzeug - INFO - 127.0.0.1 - - [24/Feb/2026 23:05:15] "[31m[1mPOST /api/auth/login HTTP/1.1[0m" 401 -
+2026-02-24 23:05:16,656 - __main__ - WARNING - Failed login attempt: albey@99.com
+2026-02-24 23:05:16,657 - werkzeug - INFO - 127.0.0.1 - - [24/Feb/2026 23:05:16] "[31m[1mPOST /api/auth/login HTTP/1.1[0m" 401 -
+2026-02-24 23:05:30,549 - werkzeug - INFO - 127.0.0.1 - - [24/Feb/2026 23:05:30] "OPTIONS /api/user/dashboard/acdb470e-87c8-42cd-8ea8-4a5932d19d6c HTTP/1.1" 200 -
+2026-02-24 23:05:30,826 - werkzeug - INFO - 127.0.0.1 - - [24/Feb/2026 23:05:30] "GET /api/user/dashboard/acdb470e-87c8-42cd-8ea8-4a5932d19d6c HTTP/1.1" 200 -
+2026-02-24 23:05:30,862 - werkzeug - INFO - 127.0.0.1 - - [24/Feb/2026 23:05:30] "OPTIONS /api/analytics/spending/7b3409d9-4019-4c33-9c29-ca44af337a0b HTTP/1.1" 200 -
+2026-02-24 23:05:31,147 - werkzeug - INFO - 127.0.0.1 - - [24/Feb/2026 23:05:31] "OPTIONS /api/account/missions/7b3409d9-4019-4c33-9c29-ca44af337a0b HTTP/1.1" 200 -
+2026-02-24 23:05:31,148 - werkzeug - INFO - 127.0.0.1 - - [24/Feb/2026 23:05:31] "OPTIONS /api/account/approvals HTTP/1.1" 200 -
+2026-02-24 23:05:31,155 - werkzeug - INFO - 127.0.0.1 - - [24/Feb/2026 23:05:31] "GET /api/analytics/spending/7b3409d9-4019-4c33-9c29-ca44af337a0b HTTP/1.1" 200 -
+2026-02-24 23:05:31,178 - werkzeug - INFO - 127.0.0.1 - - [24/Feb/2026 23:05:31] "GET /api/account/missions/7b3409d9-4019-4c33-9c29-ca44af337a0b HTTP/1.1" 200 -
+2026-02-24 23:05:31,460 - werkzeug - INFO - 127.0.0.1 - - [24/Feb/2026 23:05:31] "[35m[1mGET /api/account/approvals HTTP/1.1[0m" 500 -
