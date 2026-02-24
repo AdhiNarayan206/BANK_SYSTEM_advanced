@@ -19,11 +19,13 @@ The **v3.0 Pulsar Update** transforms the platform into an advanced financial ec
 *   ⚡ **Credit Pulsars**: Instant 'Credit Fuel' (loans) based on 5x monthly average balance with automated repayment orbits.
 
 ### 💼 Core Banking Features
-*   ✅ **User Registration**: Complete KYC onboarding with instant account creation and Sector (Branch) selection.
+*   ✅ **User Registration**: Complete KYC onboarding with instant account creation.
+*   🛰️ **Galactic Sectors (Branches)**: Accounts are managed by specific regional sectors (e.g., Sirius Prime, Andromeda Hub), selectable during registration.
+*   👥 **Twin Star Accounts (Joint Banking)**: Primary owners can invite partners to their accounts via email, enabling collaborative missions and shared liquidity.
 *   📊 **Dashboard**: Real-time account overview with masked IDs and Stellar Standing (Credit Score).
 *   💰 **Deposits**: Add funds with automated fraud detection for large transactions.
 *   🔄 **Transfers**: Send money between accounts with automatic 1% service fee and secure warp transitions.
-*   📋 **Statements**: View transaction history with customizable date ranges (7, 30, 90, or 365 days).
+*   📋 **Statements**: View transaction history with customizable date ranges.
 *   📈 **Admin Panel**: Apply system-wide daily interest and view comprehensive audit logs.
 
 ### 🎨 Design Highlights
@@ -31,7 +33,6 @@ The **v3.0 Pulsar Update** transforms the platform into an advanced financial ec
 *   **Glassmorphism UI**: Frosted glass cards with optimized `backdrop-filter: blur(20px)` effects.
 *   **Comet AI Theme**: Deep space gradients (Purple, Blue, Cyan, Pink) and Poppins typography.
 *   **Smooth Animations**: Floating cards, shimmer effects, and micro-interactions for every state.
-*   **Responsive Warp**: Designed to work beautifully on all screen sizes, from mobile to ultra-wide.
 
 ---
 
@@ -40,89 +41,54 @@ The **v3.0 Pulsar Update** transforms the platform into an advanced financial ec
 | Feature Group | Table | Key Responsibility |
 | :--- | :--- | :--- |
 | **Identity** | `users`, `auth`, `kyc_documents` | Identity, hashed credentials, and KYC status. |
-| **Banking** | `accounts`, `account_members`, `branches` | Financial containers and joint ownership mapping. |
-| **Protocols** | `ledger`, `pending_transfers` | Immutable audit trail and Duel-Auth queue. |
-| **Goals & Credit**| `savings_missions`, `loans` | Progress tracking and credit pulsar management. |
+| **Network** | `branches` | Regional sectors with specific locations and manager AI. |
+| **Joint Banking** | `account_members` | Maps users to accounts with roles like `primary` or `joint`. |
+| **Financials** | `accounts`, `pending_transfers` | Balance management and Duel-Auth transaction queue. |
+| **Audit & Goals**| `ledger`, `savings_missions`, `loans` | Immutable history, goal tracking, and credit pulsar records. |
 
 ---
 
 ## 🚀 Quick Start
 
 ### 📦 Prerequisites
-- **Python 3.10+**
-- **MySQL Server**
-- **Flask** and required dependencies (see `requirements.txt`)
+- **Python 3.10+**, **MySQL Server**, **Flask**.
 
 ### 🛰️ Setup & Deployment
-1.  **Install Dependencies**:
-    ```bash
-    pip install -r requirements.txt
-    ```
-2.  **Initialize Cosmic Logic**:
-    Launch the v3.0 Setup Protocol to create tables, security columns, and seed branches.
-    ```bash
-    python setup_comet_bank.py
-    ```
-3.  **Launch the Hyperdrive (Backend)**:
-    ```bash
-    python app.py
-    ```
-4.  **Open the Planet (Frontend)**:
-    Simply open `index.html` in your browser.
+1.  **Install**: `pip install -r requirements.txt`
+2.  **Initialize**: `python setup_comet_bank.py` (Creates tables, seeds branches, and injects security columns).
+3.  **Run Backend**: `python app.py`
+4.  **Open Interface**: Launch `index.html`.
 
 ---
 
 ## 📱 User Guide
 
-*   **1️⃣ Registration**: Click "Launch Your Journey," select your **Galactic Sector**, and provide KYC details to synthesize your identity.
-*   **2️⃣ Dashboard**: Enter your User ID to view your accounts, current Stellar Standing, and Spending Orbit.
-*   **3️⃣ Deposits**: Enter Account ID. ⚠️ Deposits over **$10,000** are flagged for review.
-*   **4️⃣ Transfers**: Initiate warp transfers. If it's a joint account, a **Pending Authorization** banner will appear for your partner.
-*   **5️⃣ Savings Missions**: Initialize as a team. Use 'Twin Star' accounts to reach planetary goals faster.
-*   **6️⃣ Admin Access**: Scale the system by applying daily interest or auditing the terminal logs.
+### 🛰️ Branch & Sector Selection
+During registration, you must choose your **Galactic Sector**. This sector handles all your local verification and manages your account orbit. You can view your sector details in the dashboard.
+
+### 👥 Creating a Joint Account (Twin Star)
+1.  Log in to your dashboard.
+2.  Navigate to the **Twin Stars** card.
+3.  Enter the **email address** of the partner you wish to invite (must be an existing Comet Bank user).
+4.  Click **"Invite Joint Member"**.
+5.  Once invited, your account becomes a "Twin Star" account, enabling shared missions and triggering **Duel-Authentication** for high-value transfers.
+
+### 💰 Transactions & Credits
+*   **Deposits**: Instant funding. $10k+ flags for manual fraud review.
+*   **Transfers**: Standard transfers are instant. Joint account transfers require the partner's PIN approval via the **Authorization Banner**.
+*   **Loans**: Apply for "Credit Pulsars" based on your average balance.
 
 ---
 
-## 🎨 Design System
+## � API Endpoints (v3.0)
 
-### **Color Palette**
-```css
-Primary Purple: #667eea
-Secondary Violet: #764ba2
-Primary Blue: #4facfe
-Accent Cyan: #00f2fe
-Primary Pink: #f093fb
-
-Dark Background: #0a0e27
-Darker Background: #050816
-```
-
-### **Special Effects**
-- ⭐ **Starfield**: Three-layer parallax stars.
-- 🌌 **Floating Orbs**: Gradient orbs with blur filters.
-- 💫 **Shimmer Text**: Animated gradient headings.
-- 🎴 **Floating Cards**: 3D hover effects with glow.
-
----
-
-## 🔐 Security & Optimization
-
-*   **Identity Uplink**: JWT-based session management with secure refresh cycles.
-*   **PIN Protocol**: All sensitive maneuvers require a 4-6 digit Transaction PIN.
-*   **Fraud Detection**: Automated flagging of high-value deposits ($10k+).
-*   **Data Masking**: Account IDs are truncated (e.g., `abcd****xyz1`) for privacy.
-*   **Performance**: All animations use GPU-accelerated CSS transforms for buttery-smooth interactivity.
-
----
-
-## 🚀 Future Enhancements
-
-- [ ] Mobile menu implementation.
-- [ ] Real-time balance updates (WebSockets).
-- [ ] Transaction notifications.
-- [ ] Export statements to PDF.
-- [ ] Currency conversion.
-- [ ] Dark/Light mode toggle.
+| Category | Endpoint | Action |
+| :--- | :--- | :--- |
+| **Network** | `GET /api/branches` | Fetch all active Galactic Sectors. |
+| **Joint Banking** | `POST /api/account/invite` | Invite a partner to join an account. |
+| **Analytics** | `GET /api/analytics/spending/<id>` | Fetch spending orbit & AI insights. |
+| **Missions** | `POST /api/account/missions` | New shared goal initialization. |
+| **Security** | `POST /api/account/approvals/process` | Partner authorization workflow. |
 
 ---
 
