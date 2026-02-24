@@ -18,6 +18,7 @@ class UserRegistrationSchema(BaseModel):
     doc_type: Optional[str] = Field(default="National_ID", description="Document type for KYC")
     doc_num: Optional[str] = Field(default="PENDING", description="Document number")
     initial_pin: str = Field(..., min_length=4, max_length=6, description="4-6 digit transaction PIN")
+    branch_id: Optional[str] = Field(None, min_length=36, max_length=36, description="Branch UUID")
 
     @field_validator('password')
     @classmethod
@@ -179,3 +180,18 @@ class ResetPinSchema(BaseModel):
         if not v.isdigit():
             raise ValueError('PIN must contain only numbers')
         return v
+
+
+class BranchCreateSchema(BaseModel):
+    """Validate admin branch creation."""
+    branch_name: str = Field(..., min_length=2, max_length=100)
+    branch_code: str = Field(..., min_length=3, max_length=20)
+    location: Optional[str] = "Deep Space"
+    manager_name: Optional[str] = "Automated AI"
+
+
+class JoinAccountInviteSchema(BaseModel):
+    """Validate invitation of a joint member."""
+    account_id: str = Field(..., min_length=36, max_length=36)
+    invitee_email: EmailStr = Field(..., description="Email of the user to invite")
+    role: Optional[str] = Field(default="joint_owner", pattern="^(joint_owner|custodian)$")

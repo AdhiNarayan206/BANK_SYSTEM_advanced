@@ -25,7 +25,8 @@ from pydantic import ValidationError
 from validators import (
     UserRegistrationSchema, LoginSchema, DepositSchema,
     WithdrawalSchema, TransferSchema, UpdateProfileSchema,
-    CreateAccountSchema, SetPinSchema, ResetPinSchema
+    CreateAccountSchema, SetPinSchema, ResetPinSchema,
+    BranchCreateSchema, JoinAccountInviteSchema
 )
 
 # Load environment variables
@@ -158,10 +159,16 @@ def register_user():
             (user_id, data.doc_type, data.doc_num)
         )
         
-        # 4. Create Initial Savings Account with PIN
+        # 4. Create Initial Savings Account with PIN and Branch
         cursor.execute(
-            "INSERT INTO accounts (account_id, user_id, account_type, balance, pin_hash) VALUES (%s, %s, 'savings', 0.00, %s)",
-            (account_id, user_id, hashed_pin)
+            "INSERT INTO accounts (account_id, user_id, account_type, balance, pin_hash, branch_id) VALUES (%s, %s, 'savings', 0.00, %s, %s)",
+            (account_id, user_id, hashed_pin, data.branch_id)
+        )
+
+        # 5. Add to Account Members (Ownership Link)
+        cursor.execute(
+            "INSERT INTO account_members (account_id, user_id, role) VALUES (%s, %s, 'primary')",
+            (account_id, user_id)
         )
         
         conn.commit()
@@ -294,19 +301,20 @@ def deposit():
     cursor = conn.cursor(MySQLdb.cursors.DictCursor)
     
     try:
-        # Verify account belongs to user
+        # Verify user is a member of the account
         cursor.execute(
-            "SELECT balance, user_id FROM accounts WHERE account_id = %s",
-            (acc_id,)
+            """
+            SELECT a.balance FROM accounts a
+            JOIN account_members am ON a.account_id = am.account_id
+            WHERE a.account_id = %s AND am.user_id = %s
+            """,
+            (acc_id, current_user)
         )
         account = cursor.fetchone()
         
         if not account:
-            return jsonify({"success": False, "error": "Account not found"}), 404
-        
-        if account['user_id'] != current_user:
             logger.warning(f"Unauthorized deposit attempt by {current_user} to {acc_id}")
-            return jsonify({"success": False, "error": "Unauthorized"}), 403
+            return jsonify({"success": False, "error": "Unauthorized or account not found"}), 403
         
         current_balance = float(account['balance'])
         new_balance = current_balance + amount
@@ -495,19 +503,20 @@ def withdraw():
     cursor = conn.cursor(MySQLdb.cursors.DictCursor)
     
     try:
-        # Verify account belongs to user and has sufficient funds
+        # Verify user is a member of the account and has sufficient funds
         cursor.execute(
-            "SELECT balance, user_id, status, pin_hash FROM accounts WHERE account_id = %s",
-            (acc_id,)
+            """
+            SELECT a.balance, a.status, a.pin_hash FROM accounts a
+            JOIN account_members am ON a.account_id = am.account_id
+            WHERE a.account_id = %s AND am.user_id = %s
+            """,
+            (acc_id, current_user)
         )
         account = cursor.fetchone()
         
         if not account:
-            return jsonify({"success": False, "error": "Account not found"}), 404
-        
-        if account['user_id'] != current_user:
             logger.warning(f"Unauthorized withdrawal attempt by {current_user} from {acc_id}")
-            return jsonify({"success": False, "error": "Unauthorized"}), 403
+            return jsonify({"success": False, "error": "Unauthorized or account not found"}), 403
         
         if account['status'] != 'active':
             return jsonify({"success": False, "error": "Account is not active"}), 403
@@ -574,21 +583,24 @@ def transfer():
     try:
         cursor.execute("START TRANSACTION")
         
-        # Verify sender account
+        # Verify sender account membership
         cursor.execute(
-            "SELECT a.balance, a.user_id, a.status, a.pin_hash, u.full_name FROM accounts a JOIN users u ON a.user_id = u.user_id WHERE a.account_id = %s FOR UPDATE",
-            (sender_id,)
+            """
+            SELECT a.balance, a.status, a.pin_hash, u.full_name 
+            FROM accounts a 
+            JOIN users u ON a.user_id = u.user_id 
+            JOIN account_members am ON a.account_id = am.account_id
+            WHERE a.account_id = %s AND am.user_id = %s
+            FOR UPDATE
+            """,
+            (sender_id, current_user)
         )
         sender = cursor.fetchone()
         
         if not sender:
             conn.rollback()
-            return jsonify({"success": False, "error": "Sender account not found"}), 404
-        
-        if sender['user_id'] != current_user:
-            conn.rollback()
-            logger.warning(f"Unauthorized transfer attempt by {current_user}")
-            return jsonify({"success": False, "error": "Unauthorized"}), 403
+            logger.warning(f"Unauthorized transfer attempt by {current_user} from {sender_id}")
+            return jsonify({"success": False, "error": "Unauthorized or sender account not found"}), 403
             
         # Verify PIN
         if not sender['pin_hash'] or not check_password_hash(sender['pin_hash'], data.pin):
@@ -678,6 +690,69 @@ def transfer():
         cursor.close()
 
 
+
+# ==================== BRANCH & NETWORK MANAGEMENT ====================
+
+@app.route('/api/branches', methods=['GET'])
+def list_branches():
+    """List all available banking sectors/branches."""
+    cursor = get_db_cursor()
+    try:
+        cursor.execute("SELECT branch_id, branch_name, branch_code, location, status FROM branches WHERE status != 'decommissioned'")
+        branches = cursor.fetchall()
+        return jsonify({"success": True, "branches": branches}), 200
+    except Exception as e:
+        logger.error(f"Error fetching branches: {str(e)}")
+        return jsonify({"success": False, "error": "Could not load branches"}), 500
+    finally:
+        cursor.close()
+
+@app.route('/api/account/invite', methods=['POST'])
+@jwt_required()
+@validate_request(JoinAccountInviteSchema)
+def invite_joint_member():
+    """Invite another user to join an account as a Twin Star (Joint Owner)."""
+    current_user = get_jwt_identity()
+    data = request.validated_data
+    
+    conn = mysql.connection
+    cursor = conn.cursor(MySQLdb.cursors.DictCursor)
+    
+    try:
+        # 1. Verify account ownership (only Primary can invite)
+        cursor.execute(
+            "SELECT 1 FROM account_members WHERE account_id = %s AND user_id = %s AND role = 'primary'",
+            (data.account_id, current_user)
+        )
+        if not cursor.fetchone():
+            return jsonify({"success": False, "error": "Only primary owner can invite members"}), 403
+            
+        # 2. Find invitee by email
+        cursor.execute("SELECT user_id FROM users WHERE email = %s", (data.invitee_email,))
+        invitee = cursor.fetchone()
+        if not invitee:
+            return jsonify({"success": False, "error": "User with this email not found"}), 404
+            
+        # 3. Add record to account_members
+        cursor.execute(
+            "INSERT INTO account_members (account_id, user_id, role) VALUES (%s, %s, %s)",
+            (data.account_id, invitee['user_id'], data.role)
+        )
+        conn.commit()
+        
+        logger.info(f"User {invitee['user_id']} invited to account {data.account_id} by {current_user}")
+        return jsonify({"success": True, "message": "Twin Star invited successfully"}), 201
+        
+    except MySQLdb.IntegrityError:
+        return jsonify({"success": False, "error": "User is already a member of this account"}), 409
+    except Exception as e:
+        conn.rollback()
+        logger.error(f"Invite error: {str(e)}")
+        return jsonify({"success": False, "error": "Failed to send invitation"}), 500
+    finally:
+        cursor.close()
+
+
 # ==================== USER & ACCOUNT MANAGEMENT ====================
 
 @app.route('/api/user/dashboard/<user_id>', methods=['GET'])
@@ -693,30 +768,37 @@ def get_dashboard(user_id):
     cursor = get_db_cursor()
     
     try:
+        # 1. Fetch User Info
+        cursor.execute("SELECT full_name, email, tax_id FROM users WHERE user_id = %s", (user_id,))
+        user_info = cursor.fetchone()
+        if not user_info:
+            return jsonify({"success": False, "error": "User not found"}), 404
+
+        # 2. Fetch all accounts where the user is a member (Primary or Joint)
         query = """
-            SELECT u.full_name, u.email, u.tax_id, a.account_id, a.account_type, 
-                   a.balance, a.status, k.verification_status, k.document_type
-            FROM users u
-            JOIN accounts a ON u.user_id = a.user_id
-            LEFT JOIN user_documents k ON u.user_id = k.user_id
-            WHERE u.user_id = %s
+            SELECT a.account_id, a.account_type, a.balance, a.status, 
+                   am.role AS membership_role, b.branch_name, b.location AS branch_location,
+                   k.verification_status, k.document_type
+            FROM accounts a
+            JOIN account_members am ON a.account_id = am.account_id
+            LEFT JOIN branches b ON a.branch_id = b.branch_id
+            LEFT JOIN user_documents k ON a.user_id = k.user_id
+            WHERE am.user_id = %s
         """
         cursor.execute(query, (user_id,))
-        result = cursor.fetchall()
-        
-        if not result:
-            return jsonify({"success": False, "error": "User not found"}), 404
+        accounts = cursor.fetchall()
         
         # Data masking for security
-        for row in result:
+        for row in accounts:
             row['balance'] = float(row['balance'])
             raw_id = row['account_id']
             row['account_id_masked'] = f"{raw_id[:8]}****{raw_id[-8:]}"
-            # Mask tax ID
-            tax_id = row['tax_id']
-            row['tax_id_masked'] = f"***{tax_id[-4:]}"
-        
-        return jsonify({"success": True, "data": result}), 200
+            
+        return jsonify({
+            "success": True, 
+            "user": user_info,
+            "data": accounts
+        }), 200
         
     except Exception as e:
         logger.error(f"Dashboard error: {str(e)}")

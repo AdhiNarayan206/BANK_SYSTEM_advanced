@@ -18,6 +18,23 @@ USE `advanced_bank`;
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
 --
+-- Table structure for table `branches`
+--
+
+DROP TABLE IF EXISTS `branches`;
+CREATE TABLE `branches` (
+  `branch_id` char(36) NOT NULL,
+  `branch_name` varchar(100) NOT NULL,
+  `branch_code` varchar(20) NOT NULL,
+  `location` varchar(255) DEFAULT 'Deep Space',
+  `manager_name` varchar(100) DEFAULT 'Automated AI',
+  `status` enum('active','decommissioned','maintenance') DEFAULT 'active',
+  `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`branch_id`),
+  UNIQUE KEY `branch_code` (`branch_code`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+--
 -- Table structure for table `accounts`
 --
 
@@ -27,13 +44,16 @@ DROP TABLE IF EXISTS `accounts`;
 CREATE TABLE `accounts` (
   `account_id` char(36) NOT NULL,
   `user_id` char(36) DEFAULT NULL,
+  `branch_id` char(36) DEFAULT NULL,
   `account_type` enum('savings','checking') NOT NULL,
   `pin_hash` varchar(255) DEFAULT NULL,
   `balance` decimal(15,2) DEFAULT '0.00',
   `status` enum('active','frozen','closed') DEFAULT 'active',
   PRIMARY KEY (`account_id`),
   KEY `user_id` (`user_id`),
-  CONSTRAINT `accounts_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`user_id`)
+  KEY `branch_id` (`branch_id`),
+  CONSTRAINT `accounts_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`user_id`),
+  CONSTRAINT `fk_account_branch` FOREIGN KEY (`branch_id`) REFERENCES `branches` (`branch_id`) ON DELETE SET NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
