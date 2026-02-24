@@ -1,6 +1,9 @@
 // ==================== CONFIGURATION ====================
 const API_BASE_URL = 'http://localhost:5000/api';
 
+// Global Chart Instance
+let spendingChart = null;
+
 // ==================== AUTHENTICATION MANAGER ====================
 class AuthManager {
     static getToken() {
@@ -77,15 +80,12 @@ class AuthManager {
 
         // Handle Token Expiry (401)
         if (response.status === 401) {
-            // Try to refresh token
             const refreshed = await this.refreshToken();
             if (refreshed) {
-                // Retry original request with new token
                 token = this.getToken();
                 options.headers['Authorization'] = `Bearer ${token}`;
                 response = await fetch(`${API_BASE_URL}${endpoint}`, options);
             } else {
-                // Refresh failed - force logout
                 this.logout();
                 throw new Error('Session expired');
             }
@@ -138,28 +138,10 @@ const closeLogin = document.getElementById('closeLogin');
 const registerOverlay = document.getElementById('registerOverlay');
 const loginOverlay = document.getElementById('loginOverlay');
 
-// Forms
-const submitRegister = document.getElementById('submitRegister');
-const submitLogin = document.getElementById('submitLogin');
-const openRegisterFromLogin = document.getElementById('openRegisterFromLogin');
-
-// Dashboard
+// Dashboard Elements
 const dashboardContent = document.getElementById('dashboardContent');
 const dashboardLoading = document.getElementById('dashboardLoading');
 const dashboardLoginPrompt = document.getElementById('dashboardLoginPrompt');
-
-// Operations
-const depositBtn = document.getElementById('depositBtn');
-const transferBtn = document.getElementById('transferBtn');
-const statementBtn = document.getElementById('statementBtn');
-const applyInterestBtn = document.getElementById('applyInterestBtn');
-const loadAuditBtn = document.getElementById('loadAuditBtn');
-
-// Toast
-const toast = document.getElementById('toast');
-const toastMessage = document.getElementById('toastMessage');
-const toastIcon = document.getElementById('toastIcon');
-const toastClose = document.getElementById('toastClose');
 
 // ==================== UI STATE MANAGEMENT ====================
 function updateUIState() {
@@ -171,7 +153,6 @@ function updateUIState() {
         logoutBtn.style.display = 'block';
         document.getElementById('profileLink').style.display = 'block';
         
-        // Auto-load dashboard if on dashboard section
         if (document.getElementById('dashboard').classList.contains('active')) {
             loadDashboard();
         }
@@ -179,6 +160,7 @@ function updateUIState() {
         loginBtn.style.display = 'block';
         registerBtn.style.display = 'block';
         logoutBtn.style.display = 'none';
+        document.getElementById('profileLink').style.display = 'none';
         
         dashboardContent.style.display = 'none';
         dashboardLoading.style.display = 'none';
@@ -192,19 +174,18 @@ navLinks.forEach(link => {
         e.preventDefault();
         const targetSection = link.getAttribute('data-section');
         
-        // Update active nav link
         navLinks.forEach(l => l.classList.remove('active'));
         link.classList.add('active');
         
-        // Show target section
         sections.forEach(section => section.classList.remove('active'));
-        document.getElementById(targetSection).classList.add('active');
+        const targetElement = document.getElementById(targetSection);
+        if (targetElement) {
+            targetElement.classList.add('active');
+        }
         
-        // Handle Dashboard Access
         if (targetSection === 'dashboard') {
-            if (AuthManager.isLoggedIn()) {
-                loadDashboard();
-            } else {
+            if (AuthManager.isLoggedIn()) loadDashboard();
+            else {
                 dashboardContent.style.display = 'none';
                 dashboardLoginPrompt.style.display = 'block';
             }
@@ -215,11 +196,8 @@ navLinks.forEach(link => {
 });
 
 window.addEventListener('scroll', () => {
-    if (window.scrollY > 50) {
-        navbar.classList.add('scrolled');
-    } else {
-        navbar.classList.remove('scrolled');
-    }
+    if (window.scrollY > 50) navbar.classList.add('scrolled');
+    else navbar.classList.remove('scrolled');
 });
 
 // ==================== MODAL HANDLING ====================
@@ -233,40 +211,40 @@ function closeModal(modal) {
     document.body.style.overflow = '';
 }
 
-// Event Listeners
 loginBtn.addEventListener('click', () => openModal(loginModal));
-registerBtn.addEventListener('click', () => openModal(registerModal));
-heroGetStarted.addEventListener('click', () => openModal(registerModal));
+registerBtn.addEventListener('click', async () => {
+    openModal(registerModal);
+    await fetchBranches();
+});
 
+heroGetStarted.addEventListener('click', () => registerBtn.click());
 closeRegister.addEventListener('click', () => closeModal(registerModal));
 registerOverlay.addEventListener('click', () => closeModal(registerModal));
-
 closeLogin.addEventListener('click', () => closeModal(loginModal));
 loginOverlay.addEventListener('click', () => closeModal(loginModal));
 
-openRegisterFromLogin.addEventListener('click', (e) => {
+document.getElementById('openRegisterFromLogin').addEventListener('click', (e) => {
     e.preventDefault();
     closeModal(loginModal);
-    setTimeout(() => openModal(registerModal), 300);
-});
-
-logoutBtn.addEventListener('click', () => AuthManager.logout());
-
-learnMore.addEventListener('click', () => {
-    document.querySelector('.features-section').scrollIntoView({ behavior: 'smooth' });
+    setTimeout(() => registerBtn.click(), 300);
 });
 
 // ==================== TOAST & ALERTS ====================
 function showToast(message, type = 'success') {
-    toastMessage.textContent = message;
+    const toast = document.getElementById('toast');
+    const toastMsg = document.getElementById('toastMessage');
+    const toastIc = document.getElementById('toastIcon');
+    
+    toastMsg.textContent = message;
     toast.className = `toast ${type}`;
-    toastIcon.textContent = type === 'success' ? '✓' : (type === 'error' ? '✕' : 'ℹ');
+    toastIc.textContent = type === 'success' ? '✓' : (type === 'error' ? '✕' : 'ℹ');
     toast.classList.add('active');
     setTimeout(() => toast.classList.remove('active'), 4000);
 }
 
 function showResult(elementId, message, isSuccess) {
     const element = document.getElementById(elementId);
+    if (!element) return;
     element.innerHTML = message;
     element.className = `result-message ${isSuccess ? 'success' : 'error'}`;
     element.style.display = 'block';
@@ -276,89 +254,7 @@ function showResult(elementId, message, isSuccess) {
     }, 5000);
 }
 
-// ==================== AUTH OPERATIONS ====================
-
-// Login
-submitLogin.addEventListener('click', async () => {
-    const email = document.getElementById('loginEmail').value;
-    const password = document.getElementById('loginPassword').value;
-    
-    if (!email || !password) {
-        showToast('Please enter both email and password', 'error');
-        return;
-    }
-    
-    submitLogin.disabled = true;
-    submitLogin.textContent = 'Logging in...';
-    
-    const result = await AuthManager.login(email, password);
-    
-    if (result.success) {
-        showToast('Login successful! Welcome back.', 'success');
-        closeModal(loginModal);
-        
-        // Navigate to dashboard
-        document.querySelector('[data-section="dashboard"]').click();
-    } else {
-        showResult('loginResult', result.error, false);
-    }
-    
-    submitLogin.disabled = false;
-    submitLogin.textContent = 'Login to Account';
-});
-
-// Registration
-submitRegister.addEventListener('click', async () => {
-    const fullName = document.getElementById('regFullName').value;
-    const email = document.getElementById('regEmail').value;
-    const password = document.getElementById('regPassword').value;
-    const taxId = document.getElementById('regTaxId').value;
-    const docType = document.getElementById('regDocType').value;
-    const docNum = document.getElementById('regDocNum').value;
-    
-    if (!fullName || !email || !password || !taxId) {
-        showToast('Please fill in all required fields', 'error');
-        return;
-    }
-
-    try {
-        const response = await fetch(`${API_BASE_URL}/auth/register`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                full_name: fullName,
-                email: email,
-                password: password,
-                tax_id: taxId,
-                doc_type: docType,
-                doc_num: docNum,
-                initial_pin: document.getElementById('regPin').value
-            })
-        });
-        
-        const data = await response.json();
-        
-        if (data.success) {
-            showResult('registerResult', 'Account created! Please login.', true);
-            showToast('Registration successful! Please login.', 'success');
-            setTimeout(() => {
-                closeModal(registerModal);
-                openModal(loginModal);
-            }, 2000);
-        } else {
-            // Show validation errors cleanly
-            let errorMsg = data.error;
-            if (data.details) {
-                errorMsg += ': ' + data.details.map(d => d.msg).join(', ');
-            }
-            showResult('registerResult', errorMsg, false);
-        }
-    } catch (error) {
-        showResult('registerResult', 'Network error occurred', false);
-    }
-});
-
-// ==================== DASHBOARD LOADING ====================
+// ==================== DASHBOARD LOAD ====================
 async function loadDashboard() {
     const user = AuthManager.getUser();
     if (!user) return;
@@ -373,329 +269,374 @@ async function loadDashboard() {
 
         if (data.success && data.data.length > 0) {
             const userData = data.data[0];
-            
-            // Update Stats
+            const primaryAccId = userData.account_id;
+
+            // Update Header Stats
             document.getElementById('userName').textContent = userData.full_name;
-            document.getElementById('verificationStatus').textContent = userData.verification_status || 'Pending';
+            document.getElementById('verificationStatus').textContent = userData.verification_status || 'Active';
+            document.getElementById('stellarStandingText').textContent = `Stellar Standing: ${userData.stellar_standing || 500} pts`;
             
             const totalBalance = data.data.reduce((sum, acc) => sum + acc.balance, 0);
-            document.getElementById('totalBalance').textContent = 
-                `$${totalBalance.toLocaleString('en-US', { minimumFractionDigits: 2 })}`;
+            document.getElementById('totalBalance').textContent = `₹${totalBalance.toLocaleString('en-IN', { minimumFractionDigits: 2 })}`;
 
             // Render Accounts
-            const accountsList = document.getElementById('accountsList');
-            accountsList.innerHTML = '';
-            
-            data.data.forEach(acc => {
-                const div = document.createElement('div');
-                div.className = 'account-item';
-                div.innerHTML = `
-                    <div class="account-info">
-                        <h4>${acc.account_type.toUpperCase()} Account</h4>
-                        <p class="text-sm text-secondary">ID: ${acc.account_id_masked}</p>
-                        <span class="status-badge ${acc.status}">${acc.status}</span>
-                    </div>
-                    <div class="account-balance">
-                        $${acc.balance.toLocaleString('en-US', { minimumFractionDigits: 2 })}
-                    </div>
-                `;
-                // Add click-to-copy functionality for account ID
-                div.addEventListener('click', () => {
-                    document.getElementById('depositAccountId').value = acc.account_id;
-                    document.getElementById('fromAccount').value = acc.account_id;
-                    document.getElementById('statementAccountId').value = acc.account_id;
-                    document.getElementById('resetPinAccountId').value = acc.account_id;
-                    showToast('Account ID copied to forms!', 'info');
-                });
-                accountsList.appendChild(div);
-            });
+            renderAccountsList(data.data);
+
+            // Parallel loading for advanced features
+            await Promise.all([
+                loadSpendingAnalysis(primaryAccId),
+                loadMissions(primaryAccId),
+                loadApprovals()
+            ]);
 
             dashboardLoading.style.display = 'none';
             dashboardContent.style.display = 'block';
         }
     } catch (error) {
         console.error('Dashboard load failed:', error);
-        dashboardLoading.innerHTML = '<p class="error-text">Failed to load dashboard. Please try logging in again.</p>';
+        dashboardLoading.innerHTML = '<p class="error-text">Network interference detected. Re-verify auth links.</p>';
     }
 }
 
-// ==================== OPERATIONS ====================
-
-// Deposit
-depositBtn.addEventListener('click', async () => {
-    const accountId = document.getElementById('depositAccountId').value;
-    const amount = document.getElementById('depositAmount').value;
-    
-    if (!accountId || !amount) return showToast('Invalid details', 'error');
-    
-    try {
-        const response = await AuthManager.fetchWithAuth('/account/deposit', {
-            method: 'POST',
-            body: JSON.stringify({ account_id: accountId, amount: parseFloat(amount) })
-        });
-        
-        const data = await response.json();
-        
-        if (data.success) {
-            showResult('depositResult', `Success! New Balance: $${data.new_balance}`, true);
-            loadDashboard(); // Refresh stats
-            document.getElementById('depositAmount').value = '';
-        } else {
-            showResult('depositResult', data.error, false);
-        }
-    } catch (error) {
-        showResult('depositResult', error.message, false);
-    }
-});
-
-// Transfer
-transferBtn.addEventListener('click', async () => {
-    const from = document.getElementById('fromAccount').value;
-    const to = document.getElementById('toAccount').value;
-    const amount = document.getElementById('transferAmount').value;
-    const pin = document.getElementById('transferPin').value;
-    
-    if (!from || !to || !amount || !pin) return showToast('Invalid details', 'error');
-    
-    try {
-        const response = await AuthManager.fetchWithAuth('/account/transfer', {
-            method: 'POST',
-            body: JSON.stringify({ from_account: from, to_account: to, amount: parseFloat(amount), pin: pin })
-        });
-        
-        const data = await response.json();
-        
-        if (data.success) {
-            showResult('transferResult', `Transfer Complete! Fee: $${data.fee_charged}`, true);
-            loadDashboard();
-            document.getElementById('transferAmount').value = '';
-        } else {
-            showResult('transferResult', data.error, false);
-        }
-    } catch (error) {
-        showResult('transferResult', error.message, false);
-    }
-});
-
-// Withdraw
-document.getElementById('withdrawBtn').addEventListener('click', async () => {
-    const accountId = document.getElementById('withdrawAccountId').value;
-    const amount = document.getElementById('withdrawAmount').value;
-    const pin = document.getElementById('withdrawPin').value;
-    
-    if (!accountId || !amount || !pin) return showToast('Invalid details', 'error');
-    
-    try {
-        const response = await AuthManager.fetchWithAuth('/account/withdraw', {
-            method: 'POST',
-            body: JSON.stringify({ 
-                account_id: accountId, 
-                amount: parseFloat(amount),
-                pin: pin 
-            })
-        });
-        
-        const data = await response.json();
-        
-        if (data.success) {
-            showResult('withdrawResult', `Withdrawal Complete! New Balance: $${data.new_balance}`, true);
-            loadDashboard();
-            document.getElementById('withdrawAmount').value = '';
-            document.getElementById('withdrawPin').value = '';
-        } else {
-            showResult('withdrawResult', data.error, false);
-        }
-    } catch (error) {
-        showResult('withdrawResult', error.message, false);
-    }
-});
-
-// Open New Account
-document.getElementById('submitOpenAccount').addEventListener('click', async () => {
-    const type = document.getElementById('newAccType').value;
-    const pin = document.getElementById('newAccPin').value;
-    
-    if (!pin || pin.length < 4) return showResult('openAccountResult', 'Invalid PIN', false);
-    
-    try {
-        const response = await AuthManager.fetchWithAuth('/account/create', {
-            method: 'POST',
-            body: JSON.stringify({ account_type: type, pin: pin })
-        });
-        
-        const data = await response.json();
-        
-        if (data.success) {
-            showToast('Account Opened Successfully!', 'success');
-            setTimeout(() => {
-                document.getElementById('openAccountModal').classList.remove('active');
-                loadDashboard();
-            }, 1000);
-        } else {
-            showResult('openAccountResult', data.error, false);
-        }
-    } catch (error) {
-        showResult('openAccountResult', error.message, false);
-    }
-});
-
-// Update Profile
-document.getElementById('submitProfileUpdate').addEventListener('click', async () => {
-    const fullName = document.getElementById('updateFullName').value;
-    const email = document.getElementById('updateEmail').value;
-    
-    if (!fullName && !email) return showResult('profileUpdateResult', 'Nothing to update', false);
-    
-    const user = AuthManager.getUser();
-    
-    try {
-        const response = await AuthManager.fetchWithAuth(`/user/profile/${user.user_id}`, {
-            method: 'PUT',
-            body: JSON.stringify({ 
-                full_name: fullName || undefined,
-                email: email || undefined
-            })
-        });
-        
-        const data = await response.json();
-        
-        if (data.success) {
-            showResult('profileUpdateResult', 'Profile Updated!', true);
-        } else {
-            showResult('profileUpdateResult', data.error, false);
-        }
-    } catch (error) {
-        showResult('profileUpdateResult', error.message, false);
-    }
-});
-
-// Reset PIN
-document.getElementById('submitResetPin').addEventListener('click', async () => {
-    const accountId = document.getElementById('resetPinAccountId').value;
-    const newPin = document.getElementById('resetPinNewPin').value;
-    const password = document.getElementById('resetPinPassword').value;
-    
-    if (!accountId || !newPin || !password) {
-        return showResult('resetPinResult', 'Please fill all fields', false);
-    }
-    
-    if (newPin.length < 4 || newPin.length > 6) {
-        return showResult('resetPinResult', 'PIN must be 4-6 digits', false);
-    }
-    
-    try {
-        const response = await AuthManager.fetchWithAuth('/account/reset-pin', {
-            method: 'POST',
-            body: JSON.stringify({ 
-                account_id: accountId, 
-                new_pin: newPin,
-                password: password
-            })
-        });
-        
-        const data = await response.json();
-        
-        if (data.success) {
-            showResult('resetPinResult', 'PIN Reset Successfully!', true);
-            showToast('PIN has been updated', 'success');
-            setTimeout(() => {
-                document.getElementById('resetPinModal').classList.remove('active');
-                // Clear fields
-                document.getElementById('resetPinNewPin').value = '';
-                document.getElementById('resetPinPassword').value = '';
-            }, 2000);
-        } else {
-            showResult('resetPinResult', data.error, false);
-        }
-    } catch (error) {
-        showResult('resetPinResult', error.message, false);
-    }
-});
-
-// Statement
-statementBtn.addEventListener('click', async () => {
-    const accountId = document.getElementById('statementAccountId').value;
-    const days = document.getElementById('statementDays').value;
-    
-    if (!accountId) return showToast('Enter Account ID', 'error');
-    
-    try {
-        const response = await AuthManager.fetchWithAuth(`/account/statement/${accountId}?days=${days}`);
-        const data = await response.json();
-        
-        const resultDiv = document.getElementById('statementResult');
-        if (data.history?.length) {
-            resultDiv.innerHTML = `
-                <table class="statement-table">
-                    <thead><tr><th>Date</th><th>Type</th><th>Amount</th><th>Balance</th></tr></thead>
-                    <tbody>${data.history.map(tx => `
-                        <tr>
-                            <td>${new Date(tx.created_at).toLocaleDateString()}</td>
-                            <td>${tx.transaction_type}</td>
-                            <td class="${tx.amount>=0?'text-success':'text-danger'}">
-                                ${tx.amount>=0?'+':''}$${Math.abs(tx.amount).toFixed(2)}
-                            </td>
-                            <td>$${tx.balance_after.toFixed(2)}</td>
-                        </tr>`).join('')}
-                    </tbody>
-                </table>`;
-        } else {
-            resultDiv.innerHTML = '<p class="text-center">No transactions found.</p>';
-        }
-    } catch (error) {
-        showToast(error.message, 'error');
-    }
-});
-
-// Admin Operations (Protected)
-applyInterestBtn.addEventListener('click', async () => {
-    if (!confirm('Apply daily interest?')) return;
-    try {
-        const response = await AuthManager.fetchWithAuth('/admin/apply-interest', { method: 'POST' });
-        const data = await response.json();
-        showResult('interestResult', data.message || data.error, data.success);
-    } catch (error) {
-        showResult('interestResult', error.message, false);
-    }
-});
-
-loadAuditBtn.addEventListener('click', async () => {
-    try {
-        const response = await AuthManager.fetchWithAuth('/admin/audit-logs');
-        const data = await response.json();
-        
-        const div = document.getElementById('auditLogsResult');
-        div.innerHTML = data.logs.map(log => `
-            <div class="audit-item" style="flex-direction: column; align-items: flex-start;">
-                <div style="display: flex; justify-content: space-between; width: 100%; margin-bottom: 0.5rem;">
-                    <div>
-                        <strong>${log.table_name}.${log.column_name || 'unspecified'}</strong>
-                        ${log.owner_name ? `<br><span style="font-size: 0.85em; color: var(--primary-purple);">Owner: ${log.owner_name}</span>` : ''}
-                    </div>
-                    <span class="status-badge ${log.action_type === 'DELETE' ? 'closed' : 'active'}">
-                        ${log.action_type || 'UPDATE'}
-                    </span>
-                </div>
-                <p class="text-secondary" style="font-family: monospace;">
-                    ${log.action_type === 'TRANSFER' 
-                        ? `<span class="text-white">Amount: $${log.old_value.toFixed(2)}</span> <span class="text-muted">|</span> <span class="text-danger">Fee: $${log.new_value.toFixed(2)}</span>`
-                        : `${log.old_value !== null ? '$' + log.old_value.toFixed(2) : 'N/A'} 
-                           <span style="color: var(--primary-blue); margin: 0 0.5rem;">➜</span> 
-                           ${log.new_value !== null ? '$' + log.new_value.toFixed(2) : 'N/A'}`
-                    }
-                </p>
-                <small style="color: var(--text-muted); margin-top: 0.25rem;">
-                    ${new Date(log.changed_at).toLocaleString()}
-                </small>
+function renderAccountsList(accounts) {
+    const list = document.getElementById('accountsList');
+    list.innerHTML = '';
+    accounts.forEach(acc => {
+        const div = document.createElement('div');
+        div.className = 'account-item';
+        div.innerHTML = `
+            <div class="account-info">
+                <h4>${acc.account_type.toUpperCase()} Account</h4>
+                <p class="text-sm text-secondary">ID: ${acc.account_id_masked}</p>
+                <small class="text-muted">${acc.branch_name || 'Main Orbit'}</small>
             </div>
-        `).join('');
-    } catch (error) {
-        showToast('Failed to load audit logs', 'error');
+            <div class="account-balance">₹${acc.balance.toLocaleString('en-IN', { minimumFractionDigits: 2 })}</div>
+        `;
+        div.addEventListener('click', () => {
+            document.getElementById('depositAccountId').value = acc.account_id;
+            document.getElementById('fromAccount').value = acc.account_id;
+            document.getElementById('withdrawAccountId').value = acc.account_id;
+            document.getElementById('statementAccountId').value = acc.account_id;
+            document.getElementById('missionAccount').value = acc.account_id;
+            document.getElementById('loanAccount').value = acc.account_id;
+            document.getElementById('resetPinAccountId').value = acc.account_id;
+            showToast('Account ID synthesized to inputs.', 'info');
+        });
+        list.appendChild(div);
+    });
+}
+
+// ==================== ADVANCED ANALYTICS ====================
+async function loadSpendingAnalysis(accId) {
+    try {
+        const res = await AuthManager.fetchWithAuth(`/analytics/spending/${accId}`);
+        const data = await res.json();
+        
+        if (data.success) {
+            renderSpendingChart(data.summary.category_breakdown);
+            renderInsights(data.stellar_insights);
+        }
+    } catch (err) {
+        console.error("Analysis load failed", err);
     }
+}
+
+function renderSpendingChart(categories) {
+    const ctx = document.getElementById('spendingChart').getContext('2d');
+    if (spendingChart) spendingChart.destroy();
+
+    const labels = categories.map(c => c.category);
+    const amounts = categories.map(c => c.total_amount);
+
+    spendingChart = new Chart(ctx, {
+        type: 'doughnut',
+        data: {
+            labels: labels,
+            datasets: [{
+                data: amounts,
+                backgroundColor: ['#667eea', '#f093fb', '#4facfe', '#f5576c', '#00f2fe'],
+                borderWidth: 0,
+                hoverOffset: 10
+            }]
+        },
+        options: {
+            plugins: {
+                legend: { position: 'bottom', labels: { color: 'rgba(255,255,255,0.7)', font: { size: 10 } } }
+            },
+            responsive: true,
+            maintainAspectRatio: false,
+            cutout: '70%'
+        }
+    });
+}
+
+function renderInsights(insights) {
+    const container = document.getElementById('stellarInsights');
+    container.innerHTML = insights.map(i => `
+        <div class="insight-bubble ${i.type}">
+            <small class="text-muted uppercase font-bold tracking-widest">${i.type}</small>
+            <p>${i.message}</p>
+        </div>
+    `).join('');
+}
+
+// ==================== MISSIONS & LOANS ====================
+async function loadMissions(accId) {
+    try {
+        const res = await AuthManager.fetchWithAuth(`/account/missions/${accId}`);
+        const data = await res.json();
+        const list = document.getElementById('missionsList');
+        
+        if (data.success && data.missions.length > 0) {
+            list.innerHTML = data.missions.map(m => {
+                const pct = Math.min(100, (m.current_progress / m.target_amount) * 100);
+                return `
+                    <div class="mission-item mb-4">
+                        <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
+                            <span class="text-sm font-bold">${m.mission_name}</span>
+                            <span class="text-xs text-accent-cyan">${pct.toFixed(0)}%</span>
+                        </div>
+                        <div class="progress-bar-bg">
+                            <div class="progress-bar-fill" style="width: ${pct}%"></div>
+                        </div>
+                        <small class="text-muted">Target: ₹${m.target_amount.toLocaleString()}</small>
+                    </div>
+                `;
+            }).join('');
+        } else {
+            list.innerHTML = '<p class="text-center text-muted text-sm">No planetary goals set.</p>';
+        }
+    } catch (err) {
+        console.error("Missions failed", err);
+    }
+}
+
+document.getElementById('submitMission').addEventListener('click', async () => {
+    const account_id = document.getElementById('missionAccount').value;
+    const mission_name = document.getElementById('missionName').value;
+    const target_amount = document.getElementById('missionTarget').value;
+
+    try {
+        const res = await AuthManager.fetchWithAuth('/account/missions', {
+            method: 'POST',
+            body: JSON.stringify({ account_id, mission_name, target_amount: parseFloat(target_amount) })
+        });
+        const data = await res.json();
+        if (data.success) {
+            showToast('Savings mission initialized!', 'success');
+            closeModal(document.getElementById('missionModal'));
+            loadDashboard();
+        } else showResult('missionResult', data.error, false);
+    } catch (err) { showResult('missionResult', err.message, false); }
 });
 
-// Initialize
+document.getElementById('submitLoan').addEventListener('click', async () => {
+    const account_id = document.getElementById('loanAccount').value;
+    const amount = document.getElementById('loanAmount').value;
+    const pin = document.getElementById('loanPin').value;
+
+    try {
+        const res = await AuthManager.fetchWithAuth('/loans/apply', {
+            method: 'POST',
+            body: JSON.stringify({ account_id, amount: parseFloat(amount), pin })
+        });
+        const data = await res.json();
+        if (data.success) {
+            showToast('Credit fuel deployed as a pulsar!', 'success');
+            closeModal(document.getElementById('loanModal'));
+            loadDashboard();
+        } else showResult('loanResult', data.error, false);
+    } catch (err) { showResult('loanResult', err.message, false); }
+});
+
+// ==================== DUEL-AUTHENTICATION ====================
+let activeTransferForApproval = null;
+
+async function loadApprovals() {
+    try {
+        const res = await AuthManager.fetchWithAuth('/account/approvals');
+        const data = await res.json();
+        const banner = document.getElementById('approvalBanner');
+        const list = document.getElementById('approvalsList');
+        
+        if (data.success && data.approvals.length > 0) {
+            banner.style.display = 'block';
+            list.innerHTML = data.approvals.map(app => `
+                <div class="approval-card p-4 glass-card mb-3" style="display: flex; justify-content: space-between; align-items: center;">
+                    <div>
+                        <p class="text-sm"><b>₹${app.amount.toLocaleString()}</b> transfer request</p>
+                        <small class="text-muted">Initiated by: ${app.initiator_name}</small>
+                    </div>
+                    <button class="btn-primary" style="padding: 0.5rem;" onclick="openApprovalVerification('${app.transfer_id}', ${app.amount})">Process</button>
+                </div>
+            `).join('');
+        } else {
+            banner.style.display = 'none';
+            list.innerHTML = '<p class="text-center">No pending authorizations.</p>';
+        }
+    } catch (err) {
+        console.error("Approvals failed", err);
+    }
+}
+
+function openApprovalVerification(id, amt) {
+    activeTransferForApproval = id;
+    document.getElementById('approvalDetails').textContent = `Please provide your transaction PIN to authorize the ₹${amt.toLocaleString()} transfer initiated by your joint account partner.`;
+    closeModal(document.getElementById('approvalsModal'));
+    openModal(document.getElementById('verifyApprovalModal'));
+}
+
+async function processApprovalAction(action) {
+    const pin = document.getElementById('approvalPin').value;
+    try {
+        const res = await AuthManager.fetchWithAuth('/account/approvals/process', {
+            method: 'POST',
+            body: JSON.stringify({ transfer_id: activeTransferForApproval, action, pin })
+        });
+        const data = await res.json();
+        if (data.success) {
+            showToast(`Authorization ${action}ed!`, 'success');
+            closeModal(document.getElementById('verifyApprovalModal'));
+            loadDashboard();
+        } else showResult('verifyApprovalResult', data.error, false);
+    } catch (err) { showResult('verifyApprovalResult', err.message, false); }
+}
+
+document.getElementById('confirmApproval').addEventListener('click', () => processApprovalAction('approve'));
+document.getElementById('rejectApproval').addEventListener('click', () => processApprovalAction('reject'));
+
+// ==================== BRANCHES & ONBOARDING ====================
+async function fetchBranches() {
+    const select = document.getElementById('regBranch');
+    try {
+        const res = await fetch(`${API_BASE_URL}/branches`);
+        const data = await res.json();
+        if (data.success && data.branches.length > 0) {
+            select.innerHTML = data.branches.map(b => `<option value="${b.branch_id}">${b.branch_name} (${b.location})</option>`).join('');
+        } else {
+            // Fallback for demo if no branches in DB
+            select.innerHTML = `
+                <option value="default-1">Sirius Prime Command (Sirius Orbit)</option>
+                <option value="default-2">Andromeda Hub (Galaxy Central)</option>
+                <option value="default-3">Lunar Outpost (Moon)</option>
+            `;
+        }
+    } catch (err) { 
+        console.error("Branch fetch fail", err);
+        select.innerHTML = '<option value="" disabled>Sector list unavailable. Connect to Mainnet.</option>';
+    }
+}
+
+submitLogin.addEventListener('click', async () => {
+    const email = document.getElementById('loginEmail').value;
+    const password = document.getElementById('loginPassword').value;
+    if (!email || !password) return showToast('Input credentials.', 'error');
+    const res = await AuthManager.login(email, password);
+    if (res.success) {
+        showToast('Warp jump successful!', 'success');
+        closeModal(loginModal);
+        document.querySelector('[data-section="dashboard"]').click();
+    } else showResult('loginResult', res.error, false);
+});
+
+submitRegister.addEventListener('click', async () => {
+    const body = {
+        full_name: document.getElementById('regFullName').value,
+        email: document.getElementById('regEmail').value,
+        password: document.getElementById('regPassword').value,
+        tax_id: document.getElementById('regTaxId').value,
+        doc_type: document.getElementById('regDocType').value,
+        doc_num: document.getElementById('regDocNum').value,
+        initial_pin: document.getElementById('regPin').value,
+        branch_id: document.getElementById('regBranch').value
+    };
+    try {
+        const response = await fetch(`${API_BASE_URL}/auth/register`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(body)
+        });
+        const data = await response.json();
+        if (data.success) {
+            showToast('Identity synthesized. Please login.', 'success');
+            setTimeout(() => { closeModal(registerModal); openModal(loginModal); }, 2000);
+        } else showResult('registerResult', data.error, false);
+    } catch (err) { showResult('registerResult', 'Network orbit unstable.', false); }
+});
+
+// ==================== OPERATIONS ====================
+depositBtn.addEventListener('click', async () => {
+    const account_id = document.getElementById('depositAccountId').value;
+    const amount = document.getElementById('depositAmount').value;
+    try {
+        const res = await AuthManager.fetchWithAuth('/account/deposit', {
+            method: 'POST',
+            body: JSON.stringify({ account_id, amount: parseFloat(amount) })
+        });
+        const data = await res.json();
+        if (data.success) {
+            showResult('depositResult', `Credits injected. New level: ₹${data.new_balance.toFixed(2)}`, true);
+            loadDashboard();
+        } else showResult('depositResult', data.error, false);
+    } catch (err) { showResult('depositResult', err.message, false); }
+});
+
+transferBtn.addEventListener('click', async () => {
+    const body = {
+        from_account: document.getElementById('fromAccount').value,
+        to_account: document.getElementById('toAccount').value,
+        amount: parseFloat(document.getElementById('transferAmount').value),
+        pin: document.getElementById('transferPin').value
+    };
+    try {
+        const res = await AuthManager.fetchWithAuth('/account/transfer', { method: 'POST', body: JSON.stringify(body) });
+        const data = await res.json();
+        if (data.success) {
+            showResult('transferResult', 'Warp transfer successful.', true);
+            loadDashboard();
+        } else showResult('transferResult', data.error, false);
+    } catch (err) { showResult('transferResult', err.message, false); }
+});
+
+document.getElementById('withdrawBtn').addEventListener('click', async () => {
+    const body = {
+        account_id: document.getElementById('withdrawAccountId').value,
+        amount: parseFloat(document.getElementById('withdrawAmount').value),
+        pin: document.getElementById('withdrawPin').value
+    };
+    try {
+        const res = await AuthManager.fetchWithAuth('/account/withdraw', { method: 'POST', body: JSON.stringify(body) });
+        const data = await res.json();
+        if (data.success) {
+            showResult('withdrawResult', 'Credits extracted.', true);
+            loadDashboard();
+        } else showResult('withdrawResult', data.error, false);
+    } catch (err) { showResult('withdrawResult', err.message, false); }
+});
+
+statementBtn.addEventListener('click', async () => {
+    const accId = document.getElementById('statementAccountId').value;
+    const days = document.getElementById('statementDays').value;
+    try {
+        const res = await AuthManager.fetchWithAuth(`/account/statement/${accId}?days=${days}`);
+        const data = await res.json();
+        const div = document.getElementById('statementResult');
+        if (data.history?.length) {
+            div.innerHTML = `<table class="statement-table">
+                <thead><tr><th>Orbit Date</th><th>Event</th><th>Credits</th></tr></thead>
+                <tbody>${data.history.map(tx => `<tr>
+                    <td>${new Date(tx.created_at).toLocaleDateString()}</td>
+                    <td class="capitalize">${tx.transaction_type.replace('_', ' ')}</td>
+                    <td class="${tx.amount>=0?'text-success':'text-danger'}">${tx.amount>=0?'+':''}${tx.amount.toFixed(2)}</td>
+                </tr>`).join('')}</tbody>
+            </table>`;
+        } else div.innerHTML = '<p class="text-center">No logs in this sector.</p>';
+    } catch (err) { showToast(err.message, 'error'); }
+});
+
+logoutBtn.addEventListener('click', () => AuthManager.logout());
+
 document.addEventListener('DOMContentLoaded', () => {
     updateUIState();
-    console.log('Comet Bank Frontend v2.0 Initialized');
+    console.log('Comet Bank OS v3.0 Powered Up.');
 });

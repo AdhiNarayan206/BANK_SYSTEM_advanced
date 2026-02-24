@@ -1,12 +1,7 @@
-"""
-Advanced Banking System API
-Secure Flask application with JWT authentication, input validation, and transaction management.
-"""
-
 import os
 import uuid
 import logging
-from datetime import timedelta
+from datetime import timedelta, datetime, date
 from functools import wraps
 from decimal import Decimal
 
@@ -26,7 +21,9 @@ from validators import (
     UserRegistrationSchema, LoginSchema, DepositSchema,
     WithdrawalSchema, TransferSchema, UpdateProfileSchema,
     CreateAccountSchema, SetPinSchema, ResetPinSchema,
-    BranchCreateSchema, JoinAccountInviteSchema
+    BranchCreateSchema, JoinAccountInviteSchema,
+    LoanApplicationSchema, MissionCreateSchema,
+    ApprovalActionSchema
 )
 
 # Load environment variables
@@ -327,8 +324,8 @@ def deposit():
         
         # Insert ledger entry
         cursor.execute(
-            "INSERT INTO ledger (account_id, transaction_type, amount, balance_after) VALUES (%s, %s, %s, %s)",
-            (acc_id, 'deposit', amount, new_balance)
+            "INSERT INTO ledger (account_id, transaction_type, amount, balance_after, initiated_by) VALUES (%s, %s, %s, %s, %s)",
+            (acc_id, 'deposit', amount, new_balance, current_user)
         )
         
         conn.commit()
@@ -540,8 +537,8 @@ def withdraw():
         
         # Insert ledger entry
         cursor.execute(
-            "INSERT INTO ledger (account_id, transaction_type, amount, balance_after) VALUES (%s, %s, %s, %s)",
-            (acc_id, 'withdrawal', -amount, new_balance)
+            "INSERT INTO ledger (account_id, transaction_type, amount, balance_after, initiated_by, category) VALUES (%s, %s, %s, %s, %s, %s)",
+            (acc_id, 'withdrawal', -amount, new_balance, current_user, data.category)
         )
         
         conn.commit()
@@ -619,6 +616,26 @@ def transfer():
                 "success": False,
                 "error": f"Insufficient funds (including 1% fee of {fee:.2f})"
             }), 400
+
+        # Approval Protocol: Check if joint account and high amount (> 5000)
+        cursor.execute("SELECT COUNT(*) as member_count FROM account_members WHERE account_id = %s", (sender_id,))
+        is_joint = cursor.fetchone()['member_count'] > 1
+        
+        if is_joint and amount > 5000:
+            transfer_id = str(uuid.uuid4())
+            expiry = datetime.now() + timedelta(hours=24)
+            cursor.execute(
+                """INSERT INTO pending_transfers (transfer_id, account_id, beneficiary_account, amount, initiated_by, expires_at) 
+                   VALUES (%s, %s, %s, %s, %s, %s)""",
+                (transfer_id, sender_id, receiver_id, amount, current_user, expiry)
+            )
+            conn.commit()
+            return jsonify({
+                "success": True, 
+                "status": "pending_approval",
+                "message": "High-value joint transfer detected. Duel-authentication required from another Twin Star.",
+                "transfer_id": transfer_id
+            }), 202
         
         # Verify receiver account
         cursor.execute(
@@ -655,12 +672,12 @@ def transfer():
         
         # Ledger entries
         cursor.execute(
-            "INSERT INTO ledger (account_id, transaction_type, amount, balance_after) VALUES (%s, %s, %s, %s)",
-            (sender_id, 'transfer_out', -total_deduction, new_sender_balance)
+            "INSERT INTO ledger (account_id, transaction_type, amount, balance_after, initiated_by, category) VALUES (%s, %s, %s, %s, %s, %s)",
+            (sender_id, 'transfer_out', -total_deduction, new_sender_balance, current_user, data.category)
         )
         cursor.execute(
-            "INSERT INTO ledger (account_id, transaction_type, amount, balance_after) VALUES (%s, %s, %s, %s)",
-            (receiver_id, 'transfer_in', amount, new_receiver_balance)
+            "INSERT INTO ledger (account_id, transaction_type, amount, balance_after, initiated_by, category) VALUES (%s, %s, %s, %s, %s, %s)",
+            (receiver_id, 'transfer_in', amount, new_receiver_balance, current_user, data.category)
         )
 
         # Audit Log for Transfer Context (Rich Log)
@@ -803,6 +820,474 @@ def get_dashboard(user_id):
     except Exception as e:
         logger.error(f"Dashboard error: {str(e)}")
         return jsonify({"success": False, "error": "Failed to load dashboard"}), 500
+    finally:
+        cursor.close()
+
+
+# ==================== CREDIT PULSARS (LOANS) ====================
+
+@app.route('/api/loans/apply', methods=['POST'])
+@jwt_required()
+@validate_request(LoanApplicationSchema)
+def apply_loan():
+    """Apply for 'Instant Credit Fuel' based on 5x monthly average balance."""
+    current_user = get_jwt_identity()
+    data = request.validated_data
+    
+    conn = mysql.connection
+    cursor = conn.cursor(MySQLdb.cursors.DictCursor)
+    
+    try:
+        # 1. Verify membership and PIN
+        cursor.execute(
+            """SELECT a.pin_hash FROM accounts a 
+               JOIN account_members am ON a.account_id = am.account_id 
+               WHERE a.account_id = %s AND am.user_id = %s""",
+            (data.account_id, current_user)
+        )
+        account = cursor.fetchone()
+        
+        if not account or not check_password_hash(account['pin_hash'], data.pin):
+            return jsonify({"success": False, "error": "Invalid PIN or account access"}), 401
+
+        # 2. Calculate 30-day average balance (Instant Credit Fuel logic)
+        cursor.execute(
+            "SELECT AVG(balance_after) as avg_balance FROM ledger WHERE account_id = %s AND created_at >= DATE_SUB(NOW(), INTERVAL 30 DAY)",
+            (data.account_id,)
+        )
+        ledger_data = cursor.fetchone()
+        avg_balance = float(ledger_data['avg_balance'] or 0)
+        
+        # Security: Also check current balance if ledger is empty
+        if avg_balance == 0:
+            cursor.execute("SELECT balance FROM accounts WHERE account_id = %s", (data.account_id,))
+            avg_balance = float(cursor.fetchone()['balance'])
+
+        max_loan = avg_balance * 5
+        
+        loan_amount = float(data.amount)
+        if loan_amount > max_loan:
+            return jsonify({
+                "success": False, 
+                "error": f"Credit Fuel limit exceeded. Based on your average balance of {avg_balance:.2f}, your max loan is {max_loan:.2f} credits."
+            }), 400
+
+        # 3. Calculate Loan Details
+        interest_rate = 12.0  # 12% Annual
+        total_repayable = loan_amount * (1 + (interest_rate/100)) # Simple interest for demo
+        monthly_payment = total_repayable / data.term_months
+        
+        loan_id = str(uuid.uuid4())
+        next_date = (date.today().replace(day=1) + timedelta(days=32)).replace(day=1) # First day of next month
+
+        # 4. Atomic Transaction: Create Loan and Deposit Principal
+        cursor.execute("START TRANSACTION")
+        
+        cursor.execute(
+            """INSERT INTO loans (loan_id, account_id, principal_amount, total_repayable, 
+               remaining_balance, monthly_repayment, term_months, next_repayment_date) 
+               VALUES (%s, %s, %s, %s, %s, %s, %s, %s)""",
+            (loan_id, data.account_id, loan_amount, total_repayable, total_repayable, monthly_payment, data.term_months, next_date)
+        )
+        
+        # Update current balance
+        cursor.execute("UPDATE accounts SET balance = balance + %s WHERE account_id = %s", (loan_amount, data.account_id))
+        
+        # Ledger entry
+        cursor.execute(
+            "INSERT INTO ledger (account_id, transaction_type, amount, balance_after) VALUES (%s, %s, %s, (SELECT balance FROM accounts WHERE account_id = %s))",
+            (data.account_id, 'deposit', loan_amount, data.account_id)
+        )
+
+        conn.commit()
+        
+        logger.info(f"Loan granted: {loan_id} to {current_user} for {loan_amount}")
+        
+        return jsonify({
+            "success": True,
+            "message": "Credit Pulsar Ignited! Principal deposited.",
+            "loan_id": loan_id,
+            "monthly_repayment": monthly_payment,
+            "total_repayable": total_repayable
+        }), 201
+
+    except Exception as e:
+        if 'conn' in locals(): conn.rollback()
+        logger.error(f"Loan application error: {str(e)}")
+        return jsonify({"success": False, "error": "System error during loan ignition"}), 500
+    finally:
+        cursor.close()
+
+@app.route('/api/admin/process-repayments', methods=['POST'])
+def process_repayments():
+    """Admin-triggered 'Repayment Orbit' - Deduct monthly payments from accounts."""
+    cursor = get_db_cursor()
+    conn = mysql.connection
+    try:
+        # Find all active loans that are due today or overdue
+        cursor.execute("SELECT * FROM loans WHERE status = 'active' AND next_repayment_date <= CURDATE()")
+        due_loans = cursor.fetchall()
+        
+        processed_count = 0
+        for loan in due_loans:
+            acc_id = loan['account_id']
+            payment = float(loan['monthly_repayment'])
+            
+            # Check balance
+            cursor.execute("SELECT balance FROM accounts WHERE account_id = %s", (acc_id,))
+            acc_data = cursor.fetchone()
+            
+            if acc_data and float(acc_data['balance']) >= payment:
+                cursor.execute("START TRANSACTION")
+                # Deduct payment
+                new_balance = float(acc_data['balance']) - payment
+                cursor.execute("UPDATE accounts SET balance = %s WHERE account_id = %s", (new_balance, acc_id))
+                
+                # Update loan record
+                new_remaining = float(loan['remaining_balance']) - payment
+                new_status = 'paid' if new_remaining <= 0.01 else 'active'
+                next_date = (loan['next_repayment_date'] + timedelta(days=32)).replace(day=1)
+                
+                cursor.execute(
+                    "UPDATE loans SET remaining_balance = %s, status = %s, next_repayment_date = %s WHERE loan_id = %s",
+                    (max(0, new_remaining), new_status, next_date, loan['loan_id'])
+                )
+                
+                # Ledger entry
+                cursor.execute(
+                    "INSERT INTO ledger (account_id, transaction_type, amount, balance_after) VALUES (%s, %s, %s, %s)",
+                    (acc_id, 'withdrawal', -payment, new_balance)
+                )
+                
+                # Boost Stellar Standing
+                cursor.execute(
+                    "UPDATE users u JOIN accounts a ON u.user_id = a.user_id SET u.stellar_standing = LEAST(1000, u.stellar_standing + 5) WHERE a.account_id = %s",
+                    (acc_id,)
+                )
+                
+                conn.commit()
+                processed_count += 1
+            else:
+                # Default logic: Decrease Stellar Standing
+                cursor.execute("START TRANSACTION")
+                cursor.execute(
+                    "UPDATE users u JOIN accounts a ON u.user_id = a.user_id SET u.stellar_standing = GREATEST(0, u.stellar_standing - 50) WHERE a.account_id = %s",
+                    (acc_id,)
+                )
+                conn.commit()
+                logger.warning(f"Loan default check: Account {acc_id} failed repayment.")
+
+        return jsonify({"success": True, "processed": processed_count}), 200
+    except Exception as e:
+        logger.error(f"Repayment error: {str(e)}")
+        return jsonify({"success": False, "error": str(e)}), 500
+    finally:
+        cursor.close()
+
+
+# ==================== TWIN STAR ENHANCEMENTS ====================
+
+@app.route('/api/account/missions', methods=['POST'])
+@jwt_required()
+@validate_request(MissionCreateSchema)
+def create_mission():
+    """Create a shared savings mission (Shared Mission Goals)."""
+    current_user = get_jwt_identity()
+    data = request.validated_data
+    
+    cursor = get_db_cursor()
+    try:
+        # Verify membership
+        cursor.execute("SELECT 1 FROM account_members WHERE account_id = %s AND user_id = %s", (data.account_id, current_user))
+        if not cursor.fetchone():
+            return jsonify({"success": False, "error": "Unauthorized"}), 403
+            
+        mission_id = str(uuid.uuid4())
+        cursor.execute(
+            "INSERT INTO savings_missions (mission_id, account_id, mission_name, target_amount) VALUES (%s, %s, %s, %s)",
+            (mission_id, data.account_id, data.mission_name, data.target_amount)
+        )
+        mysql.connection.commit()
+        return jsonify({"success": True, "mission_id": mission_id}), 201
+    except Exception as e:
+        logger.error(f"Mission error: {str(e)}")
+        return jsonify({"success": False, "error": "Failed to create mission"}), 500
+    finally:
+        cursor.close()
+
+@app.route('/api/account/missions/<account_id>', methods=['GET'])
+@jwt_required()
+def get_missions(account_id):
+    """Get all savings missions for an account."""
+    current_user = get_jwt_identity()
+    cursor = get_db_cursor()
+    try:
+        cursor.execute("SELECT 1 FROM account_members WHERE account_id = %s AND user_id = %s", (account_id, current_user))
+        if not cursor.fetchone():
+            return jsonify({"success": False, "error": "Unauthorized"}), 403
+            
+        cursor.execute("SELECT * FROM savings_missions WHERE account_id = %s", (account_id,))
+        missions = cursor.fetchall()
+        
+        # Add current balance as progress context
+        cursor.execute("SELECT balance FROM accounts WHERE account_id = %s", (account_id,))
+        balance = float(cursor.fetchone()['balance'])
+        
+        for m in missions:
+            m['current_progress'] = balance
+            m['target_amount'] = float(m['target_amount'])
+            
+        return jsonify({"success": True, "missions": missions}), 200
+    except Exception as e:
+        return jsonify({"success": False, "error": str(e)}), 500
+    finally:
+        cursor.close()
+
+@app.route('/api/account/approvals', methods=['GET'])
+@jwt_required()
+def list_pending_approvals():
+    """List transfers waiting for approval by the second owner."""
+    current_user = get_jwt_identity()
+    cursor = get_db_cursor()
+    try:
+        # Find all pending transfers for accounts where the current user is a member
+        # BUT NOT the one who initiated it.
+        query = """
+            SELECT pt.*, a.account_id, u.full_name as initiator_name
+            FROM pending_transfers pt
+            JOIN account_members am ON pt.account_id = am.account_id
+            JOIN users u ON pt.initiated_by = u.user_id
+            WHERE am.user_id = %s AND pt.initiated_by != %s AND pt.status = 'pending'
+        """
+        cursor.execute(query, (current_user, current_user))
+        approvals = cursor.fetchall()
+        
+        for a in approvals:
+            a['amount'] = float(a['amount'])
+            a['created_at'] = a['created_at'].isoformat()
+            
+        return jsonify({"success": True, "approvals": approvals}), 200
+    except Exception as e:
+        return jsonify({"success": False, "error": str(e)}), 500
+    finally:
+        cursor.close()
+
+@app.route('/api/account/approvals/process', methods=['POST'])
+@jwt_required()
+@validate_request(ApprovalActionSchema)
+def process_approval():
+    """Approve or reject a high-value pending transfer."""
+    current_user = get_jwt_identity()
+    data = request.validated_data
+    
+    conn = mysql.connection
+    cursor = conn.cursor(MySQLdb.cursors.DictCursor)
+    
+    try:
+        # 1. Fetch pending transfer details
+        cursor.execute("SELECT * FROM pending_transfers WHERE transfer_id = %s AND status = 'pending'", (data.transfer_id,))
+        pt = cursor.fetchone()
+        if not pt:
+            return jsonify({"success": False, "error": "Pending transfer not found or already processed"}), 404
+            
+        # 2. Verify current user is a Twin Star (but not the initiator)
+        cursor.execute(
+            "SELECT pin_hash FROM account_members am JOIN accounts a ON am.account_id = a.account_id WHERE am.account_id = %s AND am.user_id = %s",
+            (pt['account_id'], current_user)
+        )
+        member = cursor.fetchone()
+        if not member or pt['initiated_by'] == current_user:
+             return jsonify({"success": False, "error": "Unauthorized to approve this transfer"}), 403
+             
+        # 3. Verify PIN
+        if not check_password_hash(member['pin_hash'], data.pin):
+            return jsonify({"success": False, "error": "Invalid PIN"}), 401
+
+        if data.action == 'reject':
+            cursor.execute("UPDATE pending_transfers SET status = 'rejected' WHERE transfer_id = %s", (data.transfer_id,))
+            conn.commit()
+            return jsonify({"success": True, "message": "Transfer rejected"}), 200
+
+        # 4. Execute approved transfer
+        amount = float(pt['amount'])
+        fee = amount * 0.01
+        total_deduction = amount + fee
+        
+        cursor.execute("START TRANSACTION")
+        
+        # Check balance again
+        cursor.execute("SELECT balance FROM accounts WHERE account_id = %s FOR UPDATE", (pt['account_id'],))
+        sender_balance = float(cursor.fetchone()['balance'])
+        
+        if sender_balance < total_deduction:
+            cursor.execute("UPDATE pending_transfers SET status = 'expired' WHERE transfer_id = %s", (data.transfer_id,))
+            conn.commit()
+            return jsonify({"success": False, "error": "Insufficient funds at time of approval"}), 400
+
+        # Update balances
+        cursor.execute("UPDATE accounts SET balance = balance - %s WHERE account_id = %s", (total_deduction, pt['account_id']))
+        cursor.execute("UPDATE accounts SET balance = balance + %s WHERE account_id = %s", (amount, pt['beneficiary_account']))
+        
+        # Ledger entries
+        cursor.execute(
+            "INSERT INTO ledger (account_id, transaction_type, amount, balance_after, initiated_by) VALUES (%s, %s, %s, (SELECT balance FROM accounts WHERE account_id = %s), %s)",
+            (pt['account_id'], 'transfer_out', -total_deduction, pt['account_id'], pt['initiated_by'])
+        )
+        cursor.execute(
+            "INSERT INTO ledger (account_id, transaction_type, amount, balance_after, initiated_by) VALUES (%s, %s, %s, (SELECT balance FROM accounts WHERE account_id = %s), %s)",
+            (pt['beneficiary_account'], 'transfer_in', amount, pt['beneficiary_account'], pt['initiated_by'])
+        )
+        
+        # Update pending status
+        cursor.execute("UPDATE pending_transfers SET status = 'approved', authorized_by = %s WHERE transfer_id = %s", (current_user, data.transfer_id))
+        
+        conn.commit()
+        return jsonify({"success": True, "message": "Transfer protocol completed through duel-authentication."}), 200
+
+    except Exception as e:
+        conn.rollback()
+        return jsonify({"success": False, "error": str(e)}), 500
+    finally:
+        cursor.close()
+
+@app.route('/api/account/constellations/<account_id>', methods=['GET'])
+@jwt_required()
+def get_constellations(account_id):
+    """Get spending constellations (spending summary by user)."""
+    current_user = get_jwt_identity()
+    cursor = get_db_cursor()
+    try:
+        # Verify membership
+        cursor.execute("SELECT 1 FROM account_members WHERE account_id = %s AND user_id = %s", (account_id, current_user))
+        if not cursor.fetchone():
+            return jsonify({"success": False, "error": "Unauthorized"}), 403
+            
+        query = """
+            SELECT u.full_name, SUM(ABS(l.amount)) as total_spent
+            FROM ledger l
+            JOIN users u ON l.initiated_by = u.user_id
+            WHERE l.account_id = %s AND l.transaction_type IN ('withdrawal', 'transfer_out')
+            GROUP BY l.initiated_by
+        """
+        cursor.execute(query, (account_id,))
+        constellations = cursor.fetchall()
+        
+        for c in constellations:
+            c['total_spent'] = float(c['total_spent'])
+            
+        return jsonify({"success": True, "constellations": constellations}), 200
+    except Exception as e:
+        return jsonify({"success": False, "error": str(e)}), 500
+    finally:
+        cursor.close()
+
+@app.route('/api/analytics/spending/<account_id>', methods=['GET'])
+@jwt_required()
+def get_spending_analysis(account_id):
+    """Deep spending analysis with category breakdown and insights."""
+    current_user = get_jwt_identity()
+    days = request.args.get('days', default=30, type=int)
+    
+    cursor = get_db_cursor()
+    try:
+        # 1. Verify access
+        cursor.execute("SELECT 1 FROM account_members WHERE account_id = %s AND user_id = %s", (account_id, current_user))
+        if not cursor.fetchone():
+             return jsonify({"success": False, "error": "Unauthorized"}), 403
+
+        # 2. Category Breakdown
+        query_categories = """
+            SELECT category, SUM(ABS(amount)) as total_amount, COUNT(*) as tx_count
+            FROM ledger 
+            WHERE account_id = %s AND transaction_type IN ('withdrawal', 'transfer_out')
+            AND created_at >= DATE_SUB(NOW(), INTERVAL %s DAY)
+            GROUP BY category
+            ORDER BY total_amount DESC
+        """
+        cursor.execute(query_categories, (account_id, days))
+        categories = cursor.fetchall()
+        
+        total_spending = 0
+        for c in categories:
+            c['total_amount'] = float(c['total_amount'])
+            total_spending += c['total_amount']
+
+        # 3. Time Series (Daily Spending)
+        query_time = """
+            SELECT DATE(created_at) as date, SUM(ABS(amount)) as daily_total
+            FROM ledger
+            WHERE account_id = %s AND transaction_type IN ('withdrawal', 'transfer_out')
+            AND created_at >= DATE_SUB(NOW(), INTERVAL %s DAY)
+            GROUP BY DATE(created_at)
+            ORDER BY date ASC
+        """
+        cursor.execute(query_time, (account_id, days))
+        time_series = cursor.fetchall()
+        for t in time_series:
+            t['daily_total'] = float(t['daily_total'])
+            t['date'] = t['date'].isoformat()
+
+        # 4. Generate "Stellar Insights" (Logic-based AI)
+        insights = []
+        
+        # Insight: Top category
+        if categories:
+            top_cat = categories[0]
+            insights.append({
+                "type": "warning" if top_cat['total_amount'] > (total_spending * 0.5) else "info",
+                "message": f"Your primary spending orbit is '{top_cat['category']}', consuming { (top_cat['total_amount']/total_spending if total_spending > 0 else 0)*100:.1f}% of your credits."
+            })
+
+        # Insight: Month-over-Month comparison
+        cursor.execute("""
+            SELECT 
+                SUM(CASE WHEN created_at >= DATE_SUB(NOW(), INTERVAL 30 DAY) THEN ABS(amount) ELSE 0 END) as current_30,
+                SUM(CASE WHEN created_at >= DATE_SUB(NOW(), INTERVAL 60 DAY) AND created_at < DATE_SUB(NOW(), INTERVAL 30 DAY) THEN ABS(amount) ELSE 0 END) as previous_30
+            FROM ledger 
+            WHERE account_id = %s AND transaction_type IN ('withdrawal', 'transfer_out')
+        """, (account_id,))
+        comparison = cursor.fetchone()
+        curr_30 = float(comparison['current_30'] or 0)
+        prev_30 = float(comparison['previous_30'] or 0)
+        
+        if prev_30 > 0:
+            diff_pct = ((curr_30 - prev_30) / prev_30) * 100
+            trend = "expanded" if diff_pct > 0 else "contracted"
+            insights.append({
+                "type": "danger" if diff_pct > 20 else "success",
+                "message": f"Your spending has {trend} by {abs(diff_pct):.1f}% compared to the previous moon cycle."
+            })
+        else:
+            insights.append({"type": "info", "message": "Initial spending cycle detected. Expanding analysis..."})
+
+        # Insight: Large single transaction
+        cursor.execute("""
+            SELECT amount, category, created_at 
+            FROM ledger 
+            WHERE account_id = %s AND transaction_type IN ('withdrawal', 'transfer_out')
+            ORDER BY ABS(amount) DESC LIMIT 1
+        """, (account_id,))
+        largest = cursor.fetchone()
+        if largest:
+            insights.append({
+                "type": "info",
+                "message": f"Largest gravity well detected: {abs(float(largest['amount'])):.2f} credits spent on '{largest['category']}'."
+            })
+
+        return jsonify({
+            "success": True,
+            "summary": {
+                "total_spending": total_spending,
+                "period_days": days,
+                "category_breakdown": categories,
+                "time_series": time_series
+            },
+            "stellar_insights": insights
+        }), 200
+
+    except Exception as e:
+        logger.error(f"Analysis error: {str(e)}")
+        return jsonify({"success": False, "error": "Failed to generate spending analysis"}), 500
     finally:
         cursor.close()
 

@@ -37,11 +37,19 @@ export const AuthProvider = ({ children }) => {
     localStorage.removeItem('access_token');
     localStorage.removeItem('user');
     setUser(null);
-    // Optional: Call backend logout
+  };
+
+  const register = async (registerData) => {
+    try {
+        const response = await api.post('/auth/register', registerData);
+        return { success: response.data.success, error: response.data.error };
+    } catch (error) {
+        return { success: false, error: error.response?.data?.error || 'Registration failed' };
+    }
   };
 
   return (
-    <AuthContext.Provider value={{ user, login, logout, loading }}>
+    <AuthContext.Provider value={{ user, login, logout, register, loading }}>
       {!loading && children}
     </AuthContext.Provider>
   );

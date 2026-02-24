@@ -400,3 +400,101 @@
 2026-01-20 21:44:57,237 - __main__ - INFO - Starting Banking System API on port 5000 (debug=True)
 2026-01-20 21:44:57,252 - werkzeug - WARNING -  * Debugger is active!
 2026-01-20 21:44:57,255 - werkzeug - INFO -  * Debugger PIN: 145-968-010
+2026-02-24 22:10:32,374 - __main__ - INFO - Starting Banking System API on port 5000 (debug=True)
+2026-02-24 22:10:32,425 - werkzeug - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:5000
+ * Running on http://192.168.0.100:5000
+2026-02-24 22:10:32,426 - werkzeug - INFO - [33mPress CTRL+C to quit[0m
+2026-02-24 22:10:32,461 - werkzeug - INFO -  * Restarting with watchdog (windowsapi)
+2026-02-24 22:10:32,798 - __main__ - INFO - Starting Banking System API on port 5000 (debug=True)
+2026-02-24 22:10:32,809 - werkzeug - WARNING -  * Debugger is active!
+2026-02-24 22:10:32,820 - werkzeug - INFO -  * Debugger PIN: 210-059-380
+2026-02-24 22:10:39,628 - werkzeug - INFO - 127.0.0.1 - - [24/Feb/2026 22:10:39] "OPTIONS /api/auth/register HTTP/1.1" 200 -
+2026-02-24 22:10:39,896 - __main__ - WARNING - Validation error: [{'type': 'value_error', 'loc': ('password',), 'msg': 'Value error, Password must contain at least one uppercase letter', 'input': '11223344', 'ctx': {'error': ValueError('Password must contain at least one uppercase letter')}, 'url': 'https://errors.pydantic.dev/2.12/v/value_error'}, {'type': 'string_too_short', 'loc': ('branch_id',), 'msg': 'String should have at least 36 characters', 'input': '', 'ctx': {'min_length': 36}, 'url': 'https://errors.pydantic.dev/2.12/v/string_too_short'}]
+2026-02-24 22:10:39,897 - werkzeug - INFO - 127.0.0.1 - - [24/Feb/2026 22:10:39] "[31m[1mPOST /api/auth/register HTTP/1.1[0m" 400 -
+2026-02-24 22:10:42,187 - werkzeug - INFO - 127.0.0.1 - - [24/Feb/2026 22:10:42] "OPTIONS /api/auth/register HTTP/1.1" 200 -
+2026-02-24 22:10:42,493 - __main__ - WARNING - Validation error: [{'type': 'value_error', 'loc': ('password',), 'msg': 'Value error, Password must contain at least one uppercase letter', 'input': '11223344', 'ctx': {'error': ValueError('Password must contain at least one uppercase letter')}, 'url': 'https://errors.pydantic.dev/2.12/v/value_error'}, {'type': 'string_too_short', 'loc': ('branch_id',), 'msg': 'String should have at least 36 characters', 'input': '', 'ctx': {'min_length': 36}, 'url': 'https://errors.pydantic.dev/2.12/v/string_too_short'}]
+2026-02-24 22:10:42,494 - werkzeug - INFO - 127.0.0.1 - - [24/Feb/2026 22:10:42] "[31m[1mPOST /api/auth/register HTTP/1.1[0m" 400 -
+2026-02-24 22:10:48,100 - werkzeug - INFO - 127.0.0.1 - - [24/Feb/2026 22:10:48] "OPTIONS /api/auth/register HTTP/1.1" 200 -
+2026-02-24 22:10:48,410 - __main__ - WARNING - Validation error: [{'type': 'value_error', 'loc': ('password',), 'msg': 'Value error, Password must contain at least one uppercase letter', 'input': '11223344', 'ctx': {'error': ValueError('Password must contain at least one uppercase letter')}, 'url': 'https://errors.pydantic.dev/2.12/v/value_error'}, {'type': 'string_too_short', 'loc': ('branch_id',), 'msg': 'String should have at least 36 characters', 'input': '', 'ctx': {'min_length': 36}, 'url': 'https://errors.pydantic.dev/2.12/v/string_too_short'}]
+2026-02-24 22:10:48,411 - werkzeug - INFO - 127.0.0.1 - - [24/Feb/2026 22:10:48] "[31m[1mPOST /api/auth/register HTTP/1.1[0m" 400 -
+2026-02-24 22:10:58,893 - werkzeug - INFO - 127.0.0.1 - - [24/Feb/2026 22:10:58] "OPTIONS /api/auth/register HTTP/1.1" 200 -
+2026-02-24 22:10:59,208 - __main__ - WARNING - Validation error: [{'type': 'value_error', 'loc': ('password',), 'msg': 'Value error, Password must contain at least one lowercase letter', 'input': 'A11223344', 'ctx': {'error': ValueError('Password must contain at least one lowercase letter')}, 'url': 'https://errors.pydantic.dev/2.12/v/value_error'}, {'type': 'string_too_short', 'loc': ('branch_id',), 'msg': 'String should have at least 36 characters', 'input': '', 'ctx': {'min_length': 36}, 'url': 'https://errors.pydantic.dev/2.12/v/string_too_short'}]
+2026-02-24 22:10:59,209 - werkzeug - INFO - 127.0.0.1 - - [24/Feb/2026 22:10:59] "[31m[1mPOST /api/auth/register HTTP/1.1[0m" 400 -
+2026-02-24 22:11:44,442 - werkzeug - INFO - 127.0.0.1 - - [24/Feb/2026 22:11:44] "OPTIONS /api/auth/register HTTP/1.1" 200 -
+2026-02-24 22:11:44,748 - __main__ - WARNING - Validation error: [{'type': 'string_too_short', 'loc': ('branch_id',), 'msg': 'String should have at least 36 characters', 'input': '', 'ctx': {'min_length': 36}, 'url': 'https://errors.pydantic.dev/2.12/v/string_too_short'}]
+2026-02-24 22:11:44,748 - werkzeug - INFO - 127.0.0.1 - - [24/Feb/2026 22:11:44] "[31m[1mPOST /api/auth/register HTTP/1.1[0m" 400 -
+2026-02-24 22:14:42,346 - werkzeug - INFO -  * Detected change in 'C:\\Users\\adhin\\OneDrive\\Desktop\\VS CODE\\project\\BLOOD_BANK\\banking_systemremastered\\BLOOD_BANK_SYSTEM_advanced\\fix_db.py', reloading
+2026-02-24 22:14:43,236 - werkzeug - INFO -  * Restarting with watchdog (windowsapi)
+2026-02-24 22:14:43,588 - __main__ - INFO - Starting Banking System API on port 5000 (debug=True)
+2026-02-24 22:14:43,601 - werkzeug - WARNING -  * Debugger is active!
+2026-02-24 22:14:43,605 - werkzeug - INFO -  * Debugger PIN: 210-059-380
+2026-02-24 22:16:57,846 - werkzeug - INFO - 127.0.0.1 - - [24/Feb/2026 22:16:57] "GET /api/branches HTTP/1.1" 200 -
+2026-02-24 22:17:59,431 - werkzeug - INFO - 127.0.0.1 - - [24/Feb/2026 22:17:59] "OPTIONS /api/auth/register HTTP/1.1" 200 -
+2026-02-24 22:18:00,028 - __main__ - INFO - New user registered: 0da13aa5-5067-4f47-bb33-47f4ff66bd26 - adhi@user.com
+2026-02-24 22:18:00,029 - werkzeug - INFO - 127.0.0.1 - - [24/Feb/2026 22:18:00] "[35m[1mPOST /api/auth/register HTTP/1.1[0m" 201 -
+2026-02-24 22:18:21,379 - werkzeug - INFO - 127.0.0.1 - - [24/Feb/2026 22:18:21] "OPTIONS /api/auth/login HTTP/1.1" 200 -
+2026-02-24 22:18:21,858 - __main__ - WARNING - Failed login attempt: adhi@user.com
+2026-02-24 22:18:21,859 - werkzeug - INFO - 127.0.0.1 - - [24/Feb/2026 22:18:21] "[31m[1mPOST /api/auth/login HTTP/1.1[0m" 401 -
+2026-02-24 22:18:24,781 - werkzeug - INFO - 127.0.0.1 - - [24/Feb/2026 22:18:24] "GET /api/branches HTTP/1.1" 200 -
+2026-02-24 22:18:40,581 - werkzeug - INFO - 127.0.0.1 - - [24/Feb/2026 22:18:40] "OPTIONS /api/auth/register HTTP/1.1" 200 -
+2026-02-24 22:18:41,144 - __main__ - WARNING - Registration failed - duplicate entry: (1062, "Duplicate entry 'adhi@user.com' for key 'users.email'")
+2026-02-24 22:18:41,144 - werkzeug - INFO - 127.0.0.1 - - [24/Feb/2026 22:18:41] "[31m[1mPOST /api/auth/register HTTP/1.1[0m" 409 -
+2026-02-24 22:18:52,674 - werkzeug - INFO - 127.0.0.1 - - [24/Feb/2026 22:18:52] "OPTIONS /api/auth/register HTTP/1.1" 200 -
+2026-02-24 22:18:53,302 - __main__ - WARNING - Registration failed - duplicate entry: (1062, "Duplicate entry '789-59-245' for key 'users.tax_id'")
+2026-02-24 22:18:53,303 - werkzeug - INFO - 127.0.0.1 - - [24/Feb/2026 22:18:53] "[31m[1mPOST /api/auth/register HTTP/1.1[0m" 409 -
+2026-02-24 22:19:00,921 - werkzeug - INFO - 127.0.0.1 - - [24/Feb/2026 22:19:00] "OPTIONS /api/auth/register HTTP/1.1" 200 -
+2026-02-24 22:19:01,541 - __main__ - INFO - New user registered: acdb470e-87c8-42cd-8ea8-4a5932d19d6c - adhi1@user.com
+2026-02-24 22:19:01,542 - werkzeug - INFO - 127.0.0.1 - - [24/Feb/2026 22:19:01] "[35m[1mPOST /api/auth/register HTTP/1.1[0m" 201 -
+2026-02-24 22:19:31,022 - werkzeug - INFO - 127.0.0.1 - - [24/Feb/2026 22:19:31] "OPTIONS /api/auth/login HTTP/1.1" 200 -
+2026-02-24 22:19:31,343 - __main__ - WARNING - Login attempt for non-existent user: adhi@user1.com
+2026-02-24 22:19:31,344 - werkzeug - INFO - 127.0.0.1 - - [24/Feb/2026 22:19:31] "[31m[1mPOST /api/auth/login HTTP/1.1[0m" 401 -
+2026-02-24 22:19:40,405 - werkzeug - INFO - 127.0.0.1 - - [24/Feb/2026 22:19:40] "GET /api/branches HTTP/1.1" 200 -
+2026-02-24 22:19:53,735 - werkzeug - INFO - 127.0.0.1 - - [24/Feb/2026 22:19:53] "OPTIONS /api/auth/login HTTP/1.1" 200 -
+2026-02-24 22:19:54,142 - __main__ - INFO - Successful login: adhi1@user.com
+2026-02-24 22:19:54,142 - werkzeug - INFO - 127.0.0.1 - - [24/Feb/2026 22:19:54] "POST /api/auth/login HTTP/1.1" 200 -
+2026-02-24 22:19:54,147 - werkzeug - INFO - 127.0.0.1 - - [24/Feb/2026 22:19:54] "OPTIONS /api/user/dashboard/acdb470e-87c8-42cd-8ea8-4a5932d19d6c HTTP/1.1" 200 -
+2026-02-24 22:19:54,480 - werkzeug - INFO - 127.0.0.1 - - [24/Feb/2026 22:19:54] "GET /api/user/dashboard/acdb470e-87c8-42cd-8ea8-4a5932d19d6c HTTP/1.1" 200 -
+2026-02-24 22:19:54,715 - werkzeug - INFO - 127.0.0.1 - - [24/Feb/2026 22:19:54] "OPTIONS /api/analytics/spending/7b3409d9-4019-4c33-9c29-ca44af337a0b HTTP/1.1" 200 -
+2026-02-24 22:19:54,802 - werkzeug - INFO - 127.0.0.1 - - [24/Feb/2026 22:19:54] "OPTIONS /api/account/missions/7b3409d9-4019-4c33-9c29-ca44af337a0b HTTP/1.1" 200 -
+2026-02-24 22:19:54,803 - werkzeug - INFO - 127.0.0.1 - - [24/Feb/2026 22:19:54] "OPTIONS /api/account/approvals HTTP/1.1" 200 -
+2026-02-24 22:19:54,815 - werkzeug - INFO - 127.0.0.1 - - [24/Feb/2026 22:19:54] "GET /api/analytics/spending/7b3409d9-4019-4c33-9c29-ca44af337a0b HTTP/1.1" 200 -
+2026-02-24 22:19:55,036 - werkzeug - INFO - 127.0.0.1 - - [24/Feb/2026 22:19:55] "GET /api/account/missions/7b3409d9-4019-4c33-9c29-ca44af337a0b HTTP/1.1" 200 -
+2026-02-24 22:19:55,126 - werkzeug - INFO - 127.0.0.1 - - [24/Feb/2026 22:19:55] "[35m[1mGET /api/account/approvals HTTP/1.1[0m" 500 -
+2026-02-24 22:20:10,102 - werkzeug - INFO - 127.0.0.1 - - [24/Feb/2026 22:20:10] "OPTIONS /api/user/dashboard/acdb470e-87c8-42cd-8ea8-4a5932d19d6c HTTP/1.1" 200 -
+2026-02-24 22:20:10,426 - werkzeug - INFO - 127.0.0.1 - - [24/Feb/2026 22:20:10] "GET /api/user/dashboard/acdb470e-87c8-42cd-8ea8-4a5932d19d6c HTTP/1.1" 200 -
+2026-02-24 22:20:10,673 - werkzeug - INFO - 127.0.0.1 - - [24/Feb/2026 22:20:10] "OPTIONS /api/analytics/spending/7b3409d9-4019-4c33-9c29-ca44af337a0b HTTP/1.1" 200 -
+2026-02-24 22:20:10,736 - werkzeug - INFO - 127.0.0.1 - - [24/Feb/2026 22:20:10] "OPTIONS /api/account/missions/7b3409d9-4019-4c33-9c29-ca44af337a0b HTTP/1.1" 200 -
+2026-02-24 22:20:10,736 - werkzeug - INFO - 127.0.0.1 - - [24/Feb/2026 22:20:10] "OPTIONS /api/account/approvals HTTP/1.1" 200 -
+2026-02-24 22:20:10,744 - werkzeug - INFO - 127.0.0.1 - - [24/Feb/2026 22:20:10] "GET /api/analytics/spending/7b3409d9-4019-4c33-9c29-ca44af337a0b HTTP/1.1" 200 -
+2026-02-24 22:20:10,988 - werkzeug - INFO - 127.0.0.1 - - [24/Feb/2026 22:20:10] "GET /api/account/missions/7b3409d9-4019-4c33-9c29-ca44af337a0b HTTP/1.1" 200 -
+2026-02-24 22:20:11,050 - werkzeug - INFO - 127.0.0.1 - - [24/Feb/2026 22:20:11] "[35m[1mGET /api/account/approvals HTTP/1.1[0m" 500 -
+2026-02-24 22:23:33,130 - werkzeug - INFO -  * Detected change in 'C:\\Users\\adhin\\OneDrive\\Desktop\\VS CODE\\project\\BLOOD_BANK\\banking_systemremastered\\BLOOD_BANK_SYSTEM_advanced\\setup_comet_bank.py', reloading
+2026-02-24 22:23:33,205 - werkzeug - INFO -  * Detected change in 'C:\\Users\\adhin\\OneDrive\\Desktop\\VS CODE\\project\\BLOOD_BANK\\banking_systemremastered\\BLOOD_BANK_SYSTEM_advanced\\setup_comet_bank.py', reloading
+2026-02-24 22:23:33,205 - werkzeug - INFO -  * Detected change in 'C:\\Users\\adhin\\OneDrive\\Desktop\\VS CODE\\project\\BLOOD_BANK\\banking_systemremastered\\BLOOD_BANK_SYSTEM_advanced\\setup_comet_bank.py', reloading
+2026-02-24 22:23:33,205 - werkzeug - INFO -  * Detected change in 'C:\\Users\\adhin\\OneDrive\\Desktop\\VS CODE\\project\\BLOOD_BANK\\banking_systemremastered\\BLOOD_BANK_SYSTEM_advanced\\setup_comet_bank.py', reloading
+2026-02-24 22:23:33,467 - werkzeug - INFO -  * Restarting with watchdog (windowsapi)
+2026-02-24 22:23:33,883 - __main__ - INFO - Starting Banking System API on port 5000 (debug=True)
+2026-02-24 22:23:33,899 - werkzeug - WARNING -  * Debugger is active!
+2026-02-24 22:23:33,906 - werkzeug - INFO -  * Debugger PIN: 210-059-380
+2026-02-24 22:26:17,162 - werkzeug - INFO - 127.0.0.1 - - [24/Feb/2026 22:26:17] "OPTIONS /api/user/dashboard/acdb470e-87c8-42cd-8ea8-4a5932d19d6c HTTP/1.1" 200 -
+2026-02-24 22:26:17,434 - werkzeug - INFO - 127.0.0.1 - - [24/Feb/2026 22:26:17] "GET /api/user/dashboard/acdb470e-87c8-42cd-8ea8-4a5932d19d6c HTTP/1.1" 200 -
+2026-02-24 22:26:17,472 - werkzeug - INFO - 127.0.0.1 - - [24/Feb/2026 22:26:17] "OPTIONS /api/analytics/spending/7b3409d9-4019-4c33-9c29-ca44af337a0b HTTP/1.1" 200 -
+2026-02-24 22:26:17,754 - werkzeug - INFO - 127.0.0.1 - - [24/Feb/2026 22:26:17] "OPTIONS /api/account/missions/7b3409d9-4019-4c33-9c29-ca44af337a0b HTTP/1.1" 200 -
+2026-02-24 22:26:17,755 - werkzeug - INFO - 127.0.0.1 - - [24/Feb/2026 22:26:17] "OPTIONS /api/account/approvals HTTP/1.1" 200 -
+2026-02-24 22:26:17,767 - werkzeug - INFO - 127.0.0.1 - - [24/Feb/2026 22:26:17] "GET /api/analytics/spending/7b3409d9-4019-4c33-9c29-ca44af337a0b HTTP/1.1" 200 -
+2026-02-24 22:26:17,788 - werkzeug - INFO - 127.0.0.1 - - [24/Feb/2026 22:26:17] "GET /api/account/missions/7b3409d9-4019-4c33-9c29-ca44af337a0b HTTP/1.1" 200 -
+2026-02-24 22:26:18,073 - werkzeug - INFO - 127.0.0.1 - - [24/Feb/2026 22:26:18] "[35m[1mGET /api/account/approvals HTTP/1.1[0m" 500 -
+2026-02-24 22:26:56,683 - werkzeug - INFO -  * Detected change in 'C:\\Users\\adhin\\AppData\\Local\\Programs\\Python\\Python313\\Lib\\datetime.py', reloading
+2026-02-24 22:26:56,689 - werkzeug - INFO -  * Detected change in 'C:\\Users\\adhin\\AppData\\Local\\Programs\\Python\\Python313\\Lib\\site-packages\\dotenv\\__init__.py', reloading
+2026-02-24 22:26:56,691 - werkzeug - INFO -  * Detected change in 'C:\\Users\\adhin\\AppData\\Local\\Programs\\Python\\Python313\\Lib\\site-packages\\dotenv\\main.py', reloading
+2026-02-24 22:26:57,271 - werkzeug - INFO -  * Restarting with watchdog (windowsapi)
+2026-02-24 22:26:57,670 - __main__ - INFO - Starting Banking System API on port 5000 (debug=True)
+2026-02-24 22:26:57,683 - werkzeug - WARNING -  * Debugger is active!
+2026-02-24 22:26:57,687 - werkzeug - INFO -  * Debugger PIN: 210-059-380
+2026-02-24 22:48:37,253 - werkzeug - INFO -  * Detected change in 'C:\\Users\\adhin\\OneDrive\\Desktop\\VS CODE\\project\\BLOOD_BANK\\banking_systemremastered\\BLOOD_BANK_SYSTEM_advanced\\app.py', reloading
+2026-02-24 22:48:37,308 - werkzeug - INFO -  * Restarting with watchdog (windowsapi)
+2026-02-24 22:48:37,872 - __main__ - INFO - Starting Banking System API on port 5000 (debug=True)
+2026-02-24 22:48:37,894 - werkzeug - WARNING -  * Debugger is active!
+2026-02-24 22:48:37,898 - werkzeug - INFO -  * Debugger PIN: 210-059-380

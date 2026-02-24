@@ -76,6 +76,7 @@ class WithdrawalSchema(BaseModel):
     account_id: str = Field(..., min_length=36, max_length=36, description="Account UUID")
     amount: Decimal = Field(..., gt=0, le=1000000, description="Withdrawal amount (positive)")
     pin: str = Field(..., min_length=4, max_length=6, description="Transaction PIN")
+    category: Optional[str] = Field(default="Others", max_length=50)
 
 
     @field_validator('amount')
@@ -93,6 +94,7 @@ class TransferSchema(BaseModel):
     to_account: str = Field(..., min_length=36, max_length=36, description="Receiver account UUID")
     amount: Decimal = Field(..., gt=0, le=1000000, description="Transfer amount (positive)")
     pin: str = Field(..., min_length=4, max_length=6, description="Transaction PIN")
+    category: Optional[str] = Field(default="Others", max_length=50)
 
     @field_validator('amount')
     @classmethod
@@ -195,3 +197,25 @@ class JoinAccountInviteSchema(BaseModel):
     account_id: str = Field(..., min_length=36, max_length=36)
     invitee_email: EmailStr = Field(..., description="Email of the user to invite")
     role: Optional[str] = Field(default="joint_owner", pattern="^(joint_owner|custodian)$")
+
+
+class LoanApplicationSchema(BaseModel):
+    """Validate loan application."""
+    account_id: str = Field(..., min_length=36, max_length=36)
+    amount: Decimal = Field(..., gt=0, le=500000)
+    term_months: int = Field(default=12, ge=1, le=60)
+    pin: str = Field(..., min_length=4, max_length=6)
+
+
+class MissionCreateSchema(BaseModel):
+    """Validate creation of a shared savings mission."""
+    account_id: str = Field(..., min_length=36, max_length=36)
+    mission_name: str = Field(..., min_length=2, max_length=100)
+    target_amount: Decimal = Field(..., gt=0)
+
+
+class ApprovalActionSchema(BaseModel):
+    """Validate approval or rejection of a pending transfer."""
+    transfer_id: str = Field(..., min_length=36, max_length=36)
+    action: str = Field(..., pattern="^(approve|reject)$")
+    pin: str = Field(..., min_length=4, max_length=6)

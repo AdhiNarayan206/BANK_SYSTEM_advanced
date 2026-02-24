@@ -28,6 +28,6 @@ SELECT account_id, user_id, 'primary' FROM accounts WHERE user_id IS NOT NULL;
 INSERT INTO `audit_log` (table_name, record_id, action_type, column_name, old_value, new_value)
 VALUES ('system', 'joint_accounts_init', 'CREATE', 'membership_table', 0.00, 1.00);
 
--- NOTE: In the future, we can remove the `user_id` column from the `accounts` table 
+-- NOTE: In the future, we can remove the `user_id` column from the `accounts` table gt
 -- because ownership is now handled by the `account_members` table. 
 -- However, for backward compatibility with existing code, we keep it for now.
