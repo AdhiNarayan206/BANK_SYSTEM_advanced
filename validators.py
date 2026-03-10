@@ -115,6 +115,7 @@ class CreateAccountSchema(BaseModel):
     """Validate new account creation."""
     account_type: str = Field(..., pattern="^(savings|checking)$", description="Account Type")
     pin: str = Field(..., min_length=4, max_length=6, description="Account PIN")
+    initial_deposit: float = Field(0.0, ge=0, description="Initial deposit amount")
 
     @field_validator('pin')
     @classmethod
